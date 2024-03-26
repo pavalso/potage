@@ -7,6 +7,7 @@ from inspect import isclass
 
 _B = TypeVar("_B")
 
+
 @dataclass(kw_only=True, repr=False)
 class _BeanProxy(Generic[_B]):
 
@@ -22,6 +23,7 @@ class _BeanProxy(Generic[_B]):
 
     def __call__(self) -> _B:
         return self.get()
+
 
 @dataclass(kw_only=True, repr=False)
 class _Bean:

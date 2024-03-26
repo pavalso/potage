@@ -8,13 +8,13 @@ from .utils import traverse_subclasses
 
 _B = TypeVar("_B")
 
-class _Jar:
 
-    _beans: dict[Type, list[_Bean]] = { }
+class _Jar:
+    _beans: dict[Type, list[_Bean]] = {}
 
     @classmethod
     def create(cls, func: Callable, **kwargs) -> _Bean:
-        return _Bean(_c = cache(func), **kwargs)
+        return _Bean(_c=cache(func), **kwargs)
 
     @classmethod
     def add(cls, _bean: _Bean) -> _Bean:
@@ -27,7 +27,7 @@ class _Jar:
         classes = [_type]
         classes.extend(traverse_subclasses(_type))
 
-        _beans = [ ]
+        _beans = []
 
         for _type in classes:
             if (_bean := cls._beans.get(_type)) is not None:
@@ -39,9 +39,9 @@ class _Jar:
 
     @classmethod
     def bean(cls, _f: _B = None,
-            /, lazy: bool = False, order: int = inf, primary: bool = False) -> _B:
+             /, lazy: bool = False, order: int = inf, primary: bool = False) -> _B:
         def _wrapper(_f) -> _Bean:
-            _bean = cls.create(_f, lazy = lazy, order = order, primary = primary)
+            _bean = cls.create(_f, lazy=lazy, order=order, primary=primary)
             cls.add(_bean)
             return _f
         return _wrapper(_f) if _f is not None else _wrapper
@@ -50,7 +50,7 @@ class _Jar:
     def autowired(cls, _type: _B) -> _BeanProxy[_B]:
         _t = _type if isinstance(_type, type) else _type.type
 
-        return _BeanProxy(_f = partial(cls.get, _t))
+        return _BeanProxy(_f=partial(cls.get, _t))
+
 
 jar = _Jar()
- 

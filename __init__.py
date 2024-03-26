@@ -10,5 +10,6 @@ class MockRepository(SqlRepository):
         self.logger.get().info("MockRepository saved data")
         super().insert()
 
+
 if __name__ == "__main__":
     main()
