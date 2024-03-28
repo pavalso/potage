@@ -1,5 +1,5 @@
-from ._jar import jar
+from ._pot import pot
 
 
-bean = jar.bean
-autowired = jar.autowired
+prepare = pot.prepare
+cook = pot.cook
