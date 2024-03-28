@@ -1,15 +1,28 @@
-from pypotage import bean
+import logging
 
-from examples import main, SqlRepository
+from src.pypotage import prepare, cook
 
-
-@bean(primary=True)
-class MockRepository(SqlRepository):
-
-    def insert(self):
-        self.logger.get().info("MockRepository saved data")
-        super().insert()
+from typing import Generic, TypeVar
 
 
-if __name__ == "__main__":
-    main()
+_T = TypeVar("_T")
+
+class Test(Generic[_T]):
+    ...
+
+@prepare(_id = "logger")
+def logger():
+    logging.basicConfig(level=logging.DEBUG)
+    return logging.getLogger(__name__)
+
+@prepare(lazy=True)
+def test() -> list[int]:
+    return [1, 2, 3]
+
+@prepare(lazy=True)
+def ing() -> Test[logging.Logger]:
+    return "sdas"
+
+cook(logging.Logger, "logger").take_out().info("Hello, World!")
+print(cook(list[int]).take_out().append(4))
+print(cook(Test[str]).take_out())
