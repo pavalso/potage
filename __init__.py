@@ -10,7 +10,7 @@ _T = TypeVar("_T")
 class Test(Generic[_T]):
     ...
 
-@prepare(_id = "logger")
+@prepare(_id = 1)
 def logger():
     logging.basicConfig(level=logging.DEBUG)
     return logging.getLogger(__name__)
@@ -19,10 +19,10 @@ def logger():
 def test() -> list[int]:
     return [1, 2, 3]
 
-@prepare(lazy=True)
+@prepare()
 def ing() -> Test[logging.Logger]:
     return "sdas"
 
-cook(logging.Logger, "logger").take_out().info("Hello, World!")
-print(cook(list[int]).take_out().append(4))
-print(cook(Test[str]).take_out())
+print(cook(logging.Logger, 1).take_out())
+print(cook(list[int]).take_out())
+print(cook(logging.Logger).take_out())

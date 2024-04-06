@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Callable, Type
+from typing import Generic, TypeVar, Callable, Any
 
 from dataclasses import dataclass
 from math import inf
@@ -18,6 +18,9 @@ class _IngredientProxy(Generic[_B]):
 
     def take_out(self) -> _B:
         _ingredients = self._f()
+
+        if _ingredients == []:
+            raise RuntimeError("No ingredients found")
 
         return _ingredients[0]() if _ingredients else None
 
@@ -39,7 +42,7 @@ class _Ingredient:
         return -inf if self.primary else self.order
 
     @property
-    def type(self) -> Type:
+    def type(self) -> Any:
         _annotation = self._c.__annotations__.get("return")
 
         if self.lazy:
@@ -48,6 +51,8 @@ class _Ingredient:
 
             if _annotation is None:
                 raise RuntimeError("Lazy ingredients must explicitly define their return type")
+
+        if _annotation is not None:
             return _annotation
 
         return type(self._c())

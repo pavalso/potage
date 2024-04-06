@@ -44,7 +44,6 @@ class _Pot:
             ingredient = cls.create(_f, lazy=lazy, order=order, primary=primary)
             cls.add(ingredient, _id=_id)
             return _f
-        print(_f)
         return _wrapper(_f) if _f is not None else _wrapper
 
     @classmethod
