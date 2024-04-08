@@ -52,7 +52,8 @@ class _Ingredient:
 
     @property
     def type(self) -> Any:
-        _annotation = self._c.__annotations__.get("return")
+        _annotation = None if not hasattr(self._c, "__annotations__") else \
+            self._c.__annotations__.get("return")
 
         if self.lazy:
             if isclass(self._c.__wrapped__):
