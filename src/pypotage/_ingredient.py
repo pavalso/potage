@@ -9,15 +9,24 @@ _B = TypeVar("_B")
 
 
 @dataclass(kw_only=True, repr=False)
+class _IngredientData:
+
+    _type: Any
+    _id: str
+
+
+@dataclass(kw_only=True, repr=False)
 class _IngredientProxy(Generic[_B]):
 
     _f: Callable
 
+    formula: _IngredientData
+
     def is_present(self) -> bool:
-        return bool(self._f())
+        return bool(self._f(self.formula._type, self.formula._id))
 
     def take_out(self) -> _B:
-        _ingredients = self._f()
+        _ingredients = self._f(self.formula._type, self.formula._id)
 
         if _ingredients == []:
             raise RuntimeError("No ingredients found")
@@ -50,7 +59,8 @@ class _Ingredient:
                 return self._c.__wrapped__
 
             if _annotation is None:
-                raise RuntimeError("Lazy ingredients must explicitly define their return type")
+                raise RuntimeError("Lazy ingredients must explicitly \
+                    define their return type")
 
         if _annotation is not None:
             return _annotation
