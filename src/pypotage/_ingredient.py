@@ -8,14 +8,14 @@ from inspect import isclass
 _B = TypeVar("_B")
 
 
-@dataclass(kw_only=True, repr=False)
+@dataclass(repr=False)
 class _IngredientData:
 
     _type: Any
     _id: str
 
 
-@dataclass(kw_only=True, repr=False)
+@dataclass(repr=False)
 class _IngredientProxy(Generic[_B]):
 
     _f: Callable
@@ -37,7 +37,7 @@ class _IngredientProxy(Generic[_B]):
         return self.take_out()
 
 
-@dataclass(kw_only=True, repr=False)
+@dataclass(repr=False)
 class _Ingredient:
 
     _c: Callable
