@@ -1,4 +1,4 @@
-from ._pot import pot
+from src.pypotage._pot import pot
 
 
 prepare = pot.prepare
