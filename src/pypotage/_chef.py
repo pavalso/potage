@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from src.pypotage._ingredient import _IngredientProxy
+from ._ingredient import _IngredientProxy
 
 
 _B = TypeVar("_B")
