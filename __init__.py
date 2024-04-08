@@ -1,13 +1,17 @@
-from src.pypotage import prepare, cook
+import abc
+
+import src.pypotage as pypotage
 
 
 if __name__ == "__main__":
-    @prepare
-    def bean1() -> str:
-        return "bean1"
+    class test(metaclass=abc.ABCMeta):
+        @classmethod
+        @abc.abstractmethod
+        def test(self): ...
 
-    @prepare
-    def bean2() -> str:
-        return "bean2"
+    @pypotage.prepare
+    class test2(test):
+        def test(self):
+            return "test"
 
-    print(cook(list[str]).take_out())
+    print(pypotage.cook(test).take_out().test())
