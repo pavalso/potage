@@ -47,7 +47,7 @@ class _Pot:
         return ingredients
 
     def prepare(self, _f: _B = None, /,
-                lazy: bool = False, order: int = inf, 
+                lazy: bool = False, order: int = inf,
                 primary: bool = False, _id: str = None) -> _B:
         def _wrapper(_f) -> _Ingredient:
             ingredient = self.create(
