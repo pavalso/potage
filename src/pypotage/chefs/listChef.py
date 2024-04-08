@@ -1,5 +1,5 @@
-from src.pypotage._chef import Chef
-from src.pypotage._ingredient import _IngredientProxy, _B, _Ingredient
+from .._chef import Chef
+from .._ingredient import _IngredientProxy, _B, _Ingredient
 
 
 class _ListIngredientProxy(_IngredientProxy):

@@ -2,14 +2,14 @@ from typing import Callable, Type, TypeVar
 from functools import cache
 from math import inf
 
-from src.pypotage.chefs.listChef import ListChef
-from src.pypotage._ingredient import (
+from .chefs.listChef import ListChef
+from ._ingredient import (
     _Ingredient,
     _IngredientProxy,
     _IngredientData
 )
-from src.pypotage.utils import traverse_subclasses
-from src.pypotage._chef import Chef
+from .utils import traverse_subclasses
+from ._chef import Chef
 
 
 _B = TypeVar("_B")
