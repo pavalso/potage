@@ -27,11 +27,16 @@ class _Pot:
         ]
 
     def create(self, func: Callable, /, **kwargs) -> _Ingredient:
-        return _Ingredient(_c=cache(func), **kwargs)
+        _ingredient = _Ingredient(
+            _c=cache(func),
+            formula=_IngredientData(**kwargs))
+        _ingredient.formula._type = _ingredient.type
+        return _ingredient
 
-    def add(self, ingredient: _Ingredient, _id: str) -> _Ingredient:
-        (_l := self.ingredients.setdefault((ingredient.type, _id), [])) \
-            .insert(0, ingredient)
+    def add(self, ingredient: _Ingredient) -> _Ingredient:
+        _l = self.ingredients.setdefault(
+            (ingredient.formula._type, ingredient.formula._id), [])
+        _l.insert(0, ingredient)
         list.sort(_l, key=lambda _b: _b.priority)
         return ingredient
 
@@ -54,8 +59,12 @@ class _Pot:
                 primary: bool = False, _id: str = None) -> _B:
         def _wrapper(_f) -> _Ingredient:
             ingredient = self.create(
-                _f, lazy=lazy, order=order, primary=primary)
-            self.add(ingredient, _id=_id)
+                _f, lazy=lazy, order=order, primary=primary, _id=_id)
+
+            for chef in self.chefs:
+                ingredient = chef.prepare(ingredient)
+
+            self.add(ingredient)
             return _f
         return _wrapper(_f) if _f is not None else _wrapper
 

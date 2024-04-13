@@ -11,8 +11,11 @@ _B = TypeVar("_B")
 @dataclass(repr=False)
 class _IngredientData:
 
-    _type: Any
-    _id: str
+    _type: Any = None
+    _id: str = None
+    lazy: bool = False
+    order: int = inf
+    primary: bool = False
 
 
 @dataclass(repr=False)
@@ -42,20 +45,18 @@ class _Ingredient:
 
     _c: Callable
 
-    lazy: bool = False
-    order: int = inf
-    primary: bool = False
+    formula: _IngredientData
 
     @property
     def priority(self) -> int:
-        return -inf if self.primary else self.order
+        return -inf if self.formula.primary else self.formula.order
 
     @property
     def type(self) -> Any:
         _annotation = None if not hasattr(self._c, "__annotations__") else \
             self._c.__annotations__.get("return")
 
-        if self.lazy:
+        if self.formula.lazy:
             if isclass(self._c.__wrapped__):
                 return self._c.__wrapped__
 

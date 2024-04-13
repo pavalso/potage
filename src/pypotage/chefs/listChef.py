@@ -13,6 +13,9 @@ class _ListIngredientProxy(_IngredientProxy):
 
 class ListChef(Chef):
 
+    def prepare(self, ingredient: _Ingredient) -> _Ingredient:
+        return super().prepare(ingredient)
+
     def cook(self, line: _IngredientProxy) -> _IngredientProxy[_B]:
         if not getattr(line.formula._type, "__origin__", None) == list:
             return line
