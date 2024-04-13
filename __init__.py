@@ -1,6 +1,6 @@
 import abc
 
-import pypotage
+from src import pypotage
 
 
 if __name__ == "__main__":
