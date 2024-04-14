@@ -1,17 +1,18 @@
-import abc
-
 from src import pypotage
 
 
 if __name__ == "__main__":
-    class test(metaclass=abc.ABCMeta):
-        @classmethod
-        @abc.abstractmethod
-        def test(self): ...
+    import typing
 
-    @pypotage.prepare
-    class test2(test):
-        def test(self):
-            return "test"
+    T = typing.TypeVar("T")
+    K = typing.TypeVar("K")
 
-    print(pypotage.cook(test).take_out().test())
+    class MyGeneric(typing.Generic[T, K]):
+        ...
+
+    class MyGenericSubclass(MyGeneric[T, K]):
+        ...
+
+    pypotage.prepare(MyGenericSubclass[typing.Generic[T], str])
+
+    print(pypotage.cook(list[MyGeneric[typing.Generic[T], str]]).take_out())

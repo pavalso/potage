@@ -1,51 +1,30 @@
 from typing import Generic, TypeVar, Callable, Any
-
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from math import inf
 from inspect import isclass
+from typing_extensions import deprecated
 
 
 _B = TypeVar("_B")
 
 
 @dataclass(repr=False)
-class _IngredientData:
+class IngredientData:
 
     _type: Any = None
     _id: str = None
     lazy: bool = False
     order: int = inf
     primary: bool = False
+    extra: dict = field(default_factory=dict)
 
 
 @dataclass(repr=False)
-class _IngredientProxy(Generic[_B]):
-
-    _f: Callable
-
-    formula: _IngredientData
-
-    def is_present(self) -> bool:
-        return bool(self._f(self.formula._type, self.formula._id))
-
-    def take_out(self) -> _B:
-        _ingredients = self._f(self.formula._type, self.formula._id)
-
-        if _ingredients == []:
-            raise RuntimeError("No ingredients found")
-
-        return _ingredients[0]() if _ingredients else None
-
-    def __call__(self) -> _B:
-        return self.take_out()
-
-
-@dataclass(repr=False)
-class _Ingredient:
+class Ingredient:
 
     _c: Callable
 
-    formula: _IngredientData
+    formula: IngredientData
 
     @property
     def priority(self) -> int:
@@ -56,18 +35,75 @@ class _Ingredient:
         _annotation = None if not hasattr(self._c, "__annotations__") else \
             self._c.__annotations__.get("return")
 
+        if _annotation is not None:
+            return _annotation
+
+        if hasattr(self._c.__wrapped__, "__origin__"):
+            return self._c.__wrapped__
+
         if self.formula.lazy:
             if isclass(self._c.__wrapped__):
                 return self._c.__wrapped__
 
-            if _annotation is None:
-                raise RuntimeError("Lazy ingredients must explicitly \
-                    define their return type")
-
-        if _annotation is not None:
-            return _annotation
+            raise RuntimeError("Lazy ingredients must explicitly \
+                define their return type")
 
         return type(self._c())
 
     def __call__(self):
         return self._c()
+
+
+@dataclass(repr=False)
+class IngredientProxy(Generic[_B]):
+
+    _f: "IngredientProxy"
+
+    formula: IngredientData
+
+    def is_present(self) -> bool:
+        return bool(self(self.formula))
+
+    def take_out(self, __ingredients: list[Ingredient] = None) -> _B:
+        if __ingredients is None:
+            __ingredients = self(self.formula)
+        return self._f.take_out(__ingredients)
+
+    def __call__(self, formula: IngredientData) -> list[Ingredient]:
+        return self._f(formula)
+
+
+class _RootIngredientProxy(IngredientProxy):
+
+    _f: Callable
+
+    def take_out(self, __ingredients: list[Ingredient] = None) -> Any:
+        if __ingredients == []:
+            raise RuntimeError("No ingredients found")
+
+        return __ingredients[0]()
+
+
+class _OrderedIngredientProxy(_RootIngredientProxy):
+
+    def __call__(self, formula: IngredientData) -> list[Ingredient]:
+        _ingredients = super().__call__(formula)
+
+        _ingredients = sorted(_ingredients, key=lambda x: x.priority)
+
+        return _ingredients
+
+
+@deprecated("Use `Ingredient` instead")
+class _Ingredient(Ingredient):
+    ...
+
+
+@deprecated("Use `IngredientProxy` instead")
+class _IngredientProxy(IngredientProxy):
+    ...
+
+
+@deprecated("Use `OrderedIngredientProxy` instead")
+class _IngredientData(IngredientData):
+    ...
