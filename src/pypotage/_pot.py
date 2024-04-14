@@ -8,7 +8,8 @@ from ._ingredient import (
     Ingredient,
     _OrderedIngredientProxy,
     IngredientProxy,
-    IngredientData
+    IngredientData,
+    NoCallIngredient
 )
 from .utils import traverse_subclasses
 from ._chef import Chef
@@ -29,8 +30,10 @@ class _Pot:
             GenericChef()
         ]
 
-    def create(self, func: Callable, /, **kwargs) -> Ingredient:
-        ingredient = Ingredient(
+    def create(self, func: Callable, /,
+               _ingredient: Type[Ingredient],
+               **kwargs) -> Ingredient:
+        ingredient = _ingredient(
             _c=cache(func),
             formula=IngredientData(**kwargs))
         ingredient.formula._type = ingredient.type
@@ -57,10 +60,14 @@ class _Pot:
 
     def prepare(self, _f: _B = None, /,
                 lazy: bool = False, order: int = inf,
-                primary: bool = False, _id: str = None) -> _B:
+                primary: bool = False, _id: str = None,
+                no_call: bool = False) -> _B:
         def _wrapper(_f) -> Ingredient:
             ingredient = self.create(
-                _f, lazy=lazy, order=order, primary=primary, _id=_id)
+                _f, lazy=lazy,
+                _ingredient=NoCallIngredient if no_call else Ingredient,
+                order=order, primary=primary,
+                _id=_id)
 
             for chef in self.chefs:
                 ingredient = chef.prepare(ingredient)
