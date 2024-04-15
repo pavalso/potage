@@ -1,20 +1,23 @@
 from .._chef import Chef
-from .._ingredient import _IngredientProxy, _B, _Ingredient
+from .._ingredient import IngredientProxy, _B, Ingredient
 
 
-class _ListIngredientProxy(_IngredientProxy):
+class _ListIngredientProxy(IngredientProxy):
 
-    def take_out(self) -> list[_B]:
-        ingredients: list[_Ingredient] = self._f(
-            self.formula._type, self.formula._id)
+    def take_out(self, __ingredients: list[Ingredient] = None) -> list[_B]:
+        if __ingredients is None:
+            __ingredients = self(self.formula)
 
-        return [ingredient() for ingredient in ingredients]
+        return [ingredient() for ingredient in __ingredients]
 
 
 class ListChef(Chef):
 
-    def cook(self, line: _IngredientProxy) -> _IngredientProxy[_B]:
+    def prepare(self, ingredient: Ingredient) -> Ingredient:
+        return super().prepare(ingredient)
+
+    def cook(self, line: IngredientProxy) -> IngredientProxy[_B]:
         if not getattr(line.formula._type, "__origin__", None) == list:
             return line
         line.formula._type = line.formula._type.__args__[0]
-        return _ListIngredientProxy(_f=line._f, formula=line.formula)
+        return _ListIngredientProxy(_f=line, formula=line.formula)

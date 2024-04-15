@@ -1,17 +1,19 @@
-import abc
-
-import pypotage
+from src import pypotage
 
 
 if __name__ == "__main__":
-    class test(metaclass=abc.ABCMeta):
-        @classmethod
-        @abc.abstractmethod
-        def test(self): ...
+    @pypotage.prepare(no_call=True)
+    class Test:
+        def __init__(self):
+            print("Test.__init__")
 
-    @pypotage.prepare
-    class test2(test):
-        def test(self):
-            return "test"
+    @pypotage.prepare(no_call=True, lazy=True)
+    def test() -> str:
+        print("test")
+        return "test"
 
-    print(pypotage.cook(test).take_out().test())
+    t = pypotage.cook(Test).take_out()
+    s = pypotage.cook(Test).take_out()
+
+    print(t())
+    print(s())

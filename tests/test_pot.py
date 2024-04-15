@@ -119,10 +119,14 @@ def test_cook_lazy():
         def __init__(self):
             raise Exception("Should be called on take_out() (On lazy beans)")
 
-    @pypotage.prepare(lazy=True)
-    def bean() -> str:
+    def bean():
         return Bean()
 
-    assert pypotage.cook(str).is_present()
-    pytest.raises(Exception, pypotage.cook(str).take_out)
-    pytest.raises(Exception, pypotage.prepare, Bean)
+    pytest.raises(Exception, pypotage.prepare, bean)
+
+    @pypotage.prepare(lazy=True)
+    def bean() -> Bean:
+        return Bean()
+
+    assert pypotage.cook(Bean).is_present()
+    pytest.raises(Exception, pypotage.cook(Bean).take_out)
