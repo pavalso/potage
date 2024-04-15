@@ -2,17 +2,18 @@ from src import pypotage
 
 
 if __name__ == "__main__":
-    import typing
+    @pypotage.prepare(no_call=True)
+    class Test:
+        def __init__(self):
+            print("Test.__init__")
 
-    T = typing.TypeVar("T")
-    K = typing.TypeVar("K")
+    @pypotage.prepare(no_call=True, lazy=True)
+    def test() -> str:
+        print("test")
+        return "test"
 
-    class MyGeneric(typing.Generic[T, K]):
-        ...
+    t = pypotage.cook(Test).take_out()
+    s = pypotage.cook(Test).take_out()
 
-    class MyGenericSubclass(MyGeneric[T, K]):
-        ...
-
-    pypotage.prepare(MyGenericSubclass[typing.Generic[T], str])
-
-    print(pypotage.cook(list[MyGeneric[typing.Generic[T], str]]).take_out())
+    print(t())
+    print(s())

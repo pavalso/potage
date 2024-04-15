@@ -2,6 +2,7 @@ from typing import Generic, TypeVar, Callable, Any
 from dataclasses import dataclass, field
 from math import inf
 from inspect import isclass
+
 from typing_extensions import deprecated
 
 
@@ -52,6 +53,34 @@ class Ingredient:
 
     def __call__(self):
         return self._c()
+
+
+class NoCallIngredient(Ingredient):
+
+    def __init__(self, _c: Callable, formula: IngredientData) -> None:
+        def _nocall(*args, **kwargs):
+            return _c
+        self.__wrapped__ = _c
+        _nocall.__annotations__ = _c.__annotations__
+        _nocall.__wrapped__ = _c.__wrapped__
+        super().__init__(_nocall, formula)
+
+    @property
+    def type(self) -> Any:
+        if isclass(self._c.__wrapped__):
+            return self._c.__wrapped__
+
+        _annotation = None if not hasattr(self._c, "__annotations__") else \
+            self._c.__annotations__.get("return")
+
+        if _annotation is not None:
+            return _annotation
+
+        if hasattr(self._c.__wrapped__, "__origin__"):
+            return self._c.__wrapped__
+
+        raise RuntimeError(
+            "No call ingredients must explicitly be annotated or wrap a class")
 
 
 @dataclass(repr=False)
