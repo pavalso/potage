@@ -61,7 +61,8 @@ class NoCallIngredient(Ingredient):
         def _nocall(*args, **kwargs):
             return _c
         self.__wrapped__ = _c
-        _nocall.__annotations__ = _c.__annotations__
+        if hasattr(_c, "__annotations__"):
+            _nocall.__annotations__ = _c.__annotations__
         _nocall.__wrapped__ = _c.__wrapped__
         super().__init__(_nocall, formula)
 
