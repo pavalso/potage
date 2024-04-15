@@ -13,7 +13,7 @@ if __name__ == "__main__":
         return "test"
 
     t = pypotage.cook(Test).take_out()
-    s = pypotage.cook(str).take_out()
+    s = pypotage.cook(Test).take_out()
 
     print(t())
     print(s())
