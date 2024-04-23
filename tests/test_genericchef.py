@@ -14,7 +14,7 @@ class TestGeneric(typing.Generic[T]):
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.pot.ingredients.clear()
+    pypotage.kitchen_.pot.ingredients.clear()
 
 
 def test_generic_chef():

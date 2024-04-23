@@ -1,5 +1,5 @@
-from .._chef import Chef
-from .._ingredient import IngredientProxy, _B, Ingredient
+from ..chef import Chef
+from ..ingredient import IngredientProxy, _B, Ingredient
 
 
 class _ListIngredientProxy(IngredientProxy):
