@@ -7,7 +7,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.pot.ingredients.clear()
+    pypotage.kitchen_.pot.ingredients.clear()
 
 
 def test_no_call_ingredient():
