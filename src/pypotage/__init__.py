@@ -4,17 +4,13 @@ from .pot import Pot
 from .kitchen import Kitchen
 
 from .chef import Chef
+from . import chefsImpl as chefs
 from .chefLine import ChefLine
-
-from .chefsImpl import (
-    ListChef,
-    GenericChef
-)
 
 
 kitchen_ = Kitchen(
     Pot(),
-    ChefLine([ListChef(), GenericChef()])
+    ChefLine([chefs.ListChef(), chefs.GenericChef()])
 )
 
 prepare = kitchen_.prepare
@@ -28,5 +24,6 @@ __all__ = [
     "ingredients",
     "Pot",
     "Kitchen",
-    "ChefLine"
+    "ChefLine",
+    "chefs",
 ]

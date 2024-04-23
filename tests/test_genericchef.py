@@ -98,3 +98,19 @@ def test_multiple_generic_class():
     assert isinstance(
         pypotage.cook(MultipleGeneric[int, str]).take_out(),
         MultipleGeneric)
+
+
+def test_generic_chef_solo():
+    kitchen_ = pypotage.Kitchen(
+        pypotage.Pot(),
+        pypotage.ChefLine([
+            pypotage.chefs.GenericChef()
+        ])
+    )
+
+    @kitchen_.prepare
+    class Bean(TestGeneric[int]):
+        ...
+
+    assert isinstance(kitchen_.cook(TestGeneric[int]).take_out(), Bean)
+    assert isinstance(kitchen_.cook(Bean).take_out(), Bean)

@@ -17,9 +17,6 @@ class ChefLine:
     def add(self, chef: Chef) -> None:
         self.chefs.append(chef)
 
-    def remove(self, chef: Chef) -> None:
-        self.chefs.remove(chef)
-
     def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
         for _chef in self.chefs:
             line = _chef.cook(line)
