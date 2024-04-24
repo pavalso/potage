@@ -2,8 +2,8 @@
 
 [![img](https://img.shields.io/pypi/v/pypotage.svg)](https://pypi.org/project/pypotage/)
 [![img](https://img.shields.io/pypi/pyversions/pypotage.svg)](https://pypi.org/project/pypotage/)
-![example workflow](https://github.com/pavalso/potage/actions/workflows/python-package.yml/badge.svg)
-TODO - Add coverage badge
+![python-package-yml](https://github.com/pavalso/potage/actions/workflows/python-package.yml/badge.svg)
+[![codecov](https://codecov.io/github/pavalso/potage/graph/badge.svg?token=GU0RXRS1E4)](https://codecov.io/github/pavalso/potage)
 
 A simple Python package that provides an easy way to use Dependency Injection in your projects.
 
