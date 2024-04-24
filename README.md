@@ -30,7 +30,6 @@ To install the development version:
 ````bash
 $ git clone https://github.com/pavalso/potage.git
 $ cd potage
-$ git checkout development
 $ python3 -m pip install -U .
 ````
 
