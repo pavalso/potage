@@ -5,7 +5,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.pot.ingredients.clear()
+    pypotage.kitchen_.pot.ingredients.clear()
 
 
 def test_prepare_normal_take_out_cases():
@@ -130,3 +130,15 @@ def test_cook_lazy():
 
     assert pypotage.cook(Bean).is_present()
     pytest.raises(Exception, pypotage.cook(Bean).take_out)
+
+
+def test_cook_lazy_not_annot():
+    def bean():
+        return 1
+
+    pytest.raises(RuntimeError, pypotage.prepare, bean, lazy=True)
+
+    @pypotage.prepare(lazy=True)
+    class Bean:
+        def __init__(self):
+            raise Exception("Should be called on take_out() (On lazy beans)")

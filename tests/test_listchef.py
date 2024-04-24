@@ -5,7 +5,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.pot.ingredients.clear()
+    pypotage.kitchen_.pot.ingredients.clear()
 
 
 def test_prepare_list():
@@ -71,3 +71,22 @@ def test_prepare_lazy_list():
 
     assert pypotage.cook(list[Bean]).is_present()
     pytest.raises(Exception, pypotage.cook(list[Bean]).take_out)
+
+
+def test_list_chef_solo():
+    kitchen_ = pypotage.Kitchen(
+        pypotage.Pot(),
+        pypotage.ChefLine([
+            pypotage.chefs.ListChef()
+        ])
+    )
+
+    @kitchen_.prepare
+    def bean1() -> str:
+        return "bean1"
+
+    @kitchen_.prepare
+    def bean2() -> str:
+        return "bean2"
+
+    assert kitchen_.cook(list[str]).take_out() == ["bean2", "bean1"]

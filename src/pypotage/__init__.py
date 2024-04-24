@@ -1,11 +1,29 @@
-from . import _ingredient as ingredients
+from . import ingredient as ingredients
 
-from ._pot import pot
-from ._chef import Chef
+from .pot import Pot
+from .kitchen import Kitchen
+
+from .chef import Chef
+from . import chefsImpl as chefs
+from .chefLine import ChefLine
 
 
-prepare = pot.prepare
-cook = pot.cook
+kitchen_ = Kitchen(
+    Pot(),
+    ChefLine([chefs.ListChef(), chefs.GenericChef()])
+)
+
+prepare = kitchen_.prepare
+cook = kitchen_.cook
 
 
-__all__ = ["prepare", "cook", "Chef", "ingredients"]
+__all__ = [
+    "prepare",
+    "cook",
+    "Chef",
+    "ingredients",
+    "Pot",
+    "Kitchen",
+    "ChefLine",
+    "chefs",
+]

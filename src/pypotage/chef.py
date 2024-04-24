@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import TypeVar
 
-from ._ingredient import IngredientProxy, Ingredient
+from .ingredient import IngredientProxy, Ingredient
 
 
 _B = TypeVar("_B")
 
 
+@dataclass
 class Chef(ABC):
 
     @abstractmethod
