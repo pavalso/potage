@@ -1,9 +1,9 @@
 # pypotage
 
-TODO - Add coverage badge
-
 [![img](https://img.shields.io/pypi/v/pypotage.svg)](https://pypi.org/project/pypotage/)
 [![img](https://img.shields.io/pypi/pyversions/pypotage.svg)](https://pypi.org/project/pypotage/)
+![example workflow](https://github.com/pavalso/potage/actions/workflows/python-package.yml/badge.svg)
+TODO - Add coverage badge
 
 A simple Python package that provides an easy way to use Dependency Injection in your projects.
 
