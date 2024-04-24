@@ -4,8 +4,6 @@
 name: Python package
 
 on:
-  push:
-    branches: [ "25-create-proyect-readme" ]
   pull_request:
     branches: [ "main", "development" ]
 
