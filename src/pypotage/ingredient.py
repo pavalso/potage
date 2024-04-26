@@ -9,13 +9,13 @@ from typing_extensions import deprecated
 _B = TypeVar("_B")
 
 
-@dataclass(repr=False)
+@dataclass
 class IngredientData:
 
     _type: Any = None
     _id: str = None
     lazy: bool = False
-    order: int = inf
+    order: int = 999999
     primary: bool = False
     extra: dict = field(default_factory=dict)
 
@@ -25,7 +25,7 @@ class Ingredient:
 
     _c: Callable
 
-    formula: IngredientData
+    formula: IngredientData = field(default_factory=IngredientData)
 
     @property
     def priority(self) -> int:
