@@ -1,4 +1,4 @@
-from typing import TypeVar, Callable
+from typing import TypeVar, Callable, Union
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from warnings import warn
@@ -63,9 +63,9 @@ class Kitchen:
 
     def prepare(
             self,
-            _f: Callable | Ingredient = None,
+            _f: Union[Callable, Ingredient] = None,
             /, **kwargs) -> Callable:
-        def _wrapper(_f: Callable | Ingredient) -> Ingredient:
+        def _wrapper(_f: Union[Callable, Ingredient]) -> Ingredient:
             if kwargs:
                 warn("kwargs are not supported in the prepare decorator")
 

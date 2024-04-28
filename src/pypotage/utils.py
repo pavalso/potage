@@ -1,4 +1,8 @@
-from typing import Any, Iterable, Iterator
+from typing import (
+    Any,
+    Iterable,
+    Iterator,
+    Union)
 from abc import ABC, abstractmethod
 
 
@@ -37,7 +41,7 @@ class Decorable(ABC, Iterable):
     @abstractmethod
     def priority(self) -> int: ...
 
-    def __init__(self, decorator: "Decorable" | Any = None) -> None:
+    def __init__(self, decorator: Union["Decorable", Any] = None) -> None:
         self._decorator = decorator
 
     def __iter__(self) -> Iterator["Decorable"]:

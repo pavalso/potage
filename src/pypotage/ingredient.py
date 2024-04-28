@@ -1,4 +1,10 @@
-from typing import Generic, TypeVar, Callable, Any
+from typing import (
+    Generic,
+    TypeVar,
+    Callable,
+    Any,
+    Union
+)
 from dataclasses import dataclass, field
 from inspect import isclass
 from math import inf
@@ -39,7 +45,7 @@ class Ingredient(Decorable):
             return self.decorator.type
         return None
 
-    def __init__(self, _c: "Ingredient" | Callable) -> None:
+    def __init__(self, _c: Union["Ingredient", Callable]) -> None:
         super().__init__(_c)
         self.formula = _c.formula \
             if isinstance(_c, Ingredient) \
