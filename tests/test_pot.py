@@ -5,7 +5,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.pot.ingredients.clear()
+    pypotage.kitchen_.pot.ingredients.clear()
 
 
 def test_prepare_normal_take_out_cases():
@@ -41,13 +41,15 @@ def test_prepare_ordered_take_out_cases():
 
     assert pypotage.cook(str).take_out() == "bean1"
 
-    @pypotage.prepare(order=1)
+    @pypotage.prepare
+    @pypotage.order(1)
     def bean2() -> str:
         return "bean2"
 
     assert pypotage.cook(str).take_out() == "bean2"
 
-    @pypotage.prepare(order=999)
+    @pypotage.prepare
+    @pypotage.order(999)
     def bean3() -> str:
         return "bean3"
 
@@ -61,7 +63,8 @@ def test_prepare_primary_take_out_cases():
 
     assert pypotage.cook(str).take_out() == "bean1"
 
-    @pypotage.prepare(primary=True)
+    @pypotage.prepare
+    @pypotage.primary
     def bean2() -> str:
         return "bean2"
 
@@ -124,9 +127,23 @@ def test_cook_lazy():
 
     pytest.raises(Exception, pypotage.prepare, bean)
 
-    @pypotage.prepare(lazy=True)
+    @pypotage.prepare
+    @pypotage.lazy
     def bean() -> Bean:
         return Bean()
 
     assert pypotage.cook(Bean).is_present()
     pytest.raises(Exception, pypotage.cook(Bean).take_out)
+
+
+def test_cook_lazy_not_annot():
+    def bean():
+        return 1
+
+    pytest.raises(RuntimeError, pypotage.prepare, pypotage.lazy(bean))
+
+    @pypotage.prepare
+    @pypotage.lazy
+    class Bean:
+        def __init__(self):
+            raise Exception("Should be called on take_out() (On lazy beans)")

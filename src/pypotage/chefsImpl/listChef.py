@@ -1,5 +1,5 @@
-from .._chef import Chef
-from .._ingredient import IngredientProxy, _B, Ingredient
+from ..kitchen import Kitchen
+from ..ingredient import IngredientProxy, _B, Ingredient
 
 
 class _ListIngredientProxy(IngredientProxy):
@@ -11,10 +11,10 @@ class _ListIngredientProxy(IngredientProxy):
         return [ingredient() for ingredient in __ingredients]
 
 
-class ListChef(Chef):
+class ListChef(Kitchen.Chef):
 
     def prepare(self, ingredient: Ingredient) -> Ingredient:
-        return super().prepare(ingredient)
+        return ingredient
 
     def cook(self, line: IngredientProxy) -> IngredientProxy[_B]:
         if not getattr(line.formula._type, "__origin__", None) == list:

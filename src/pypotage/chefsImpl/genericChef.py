@@ -1,7 +1,7 @@
 from typing import Generic
 
-from .._chef import Chef
-from .._ingredient import IngredientProxy, _B, IngredientData, Ingredient
+from ..kitchen import Kitchen
+from ..ingredient import IngredientProxy, _B, IngredientData, Ingredient
 
 
 class _GenericIngredientProxy(IngredientProxy[_B]):
@@ -20,7 +20,7 @@ class _GenericIngredientProxy(IngredientProxy[_B]):
         return ingredients
 
 
-class GenericChef(Chef):
+class GenericChef(Kitchen.Chef):
 
     def _is_generic(self, _type: type) -> bool:
         return isinstance(_type, type) and \
@@ -40,13 +40,15 @@ class GenericChef(Chef):
         formula._type = _type
         return formula
 
-    def prepare(self, ingredient: Ingredient) -> Ingredient:
+    def prepare(self,
+                ingredient: Ingredient) -> Ingredient:
         if not self._is_generic(ingredient.formula._type):
             return ingredient
         ingredient.formula = self._modify_formula(ingredient.formula)
         return ingredient
 
-    def cook(self, line: IngredientProxy) -> IngredientProxy[_B]:
+    def cook(self,
+             line: IngredientProxy) -> IngredientProxy[_B]:
         if self._is_generic(line.formula._type):
             line.formula = self._modify_formula(line.formula)
         return _GenericIngredientProxy(_f=line, formula=line.formula)
