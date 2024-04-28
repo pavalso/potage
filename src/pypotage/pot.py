@@ -1,5 +1,4 @@
-from typing import Callable, Type
-from functools import cache
+from typing import Type
 
 from .ingredient import (
     Ingredient,
@@ -14,15 +13,6 @@ class Pot:
 
     def __init__(self) -> None:
         self.ingredients: dict[Type, list[Ingredient]] = {}
-
-    def create(self, func: Callable, /,
-               _ingredient: Type[Ingredient],
-               **kwargs) -> Ingredient:
-        ingredient = _ingredient(
-            _c=cache(func),
-            formula=IngredientData(**kwargs))
-        ingredient.formula._type = ingredient.type
-        return ingredient
 
     def add(self, ingredient: Ingredient) -> Ingredient:
         _l = self.ingredients.setdefault(
