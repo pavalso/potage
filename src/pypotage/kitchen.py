@@ -1,45 +1,95 @@
-from math import inf
-from typing import TypeVar
-
-from .chefLine import ChefLine
+from typing import TypeVar, Callable, Union
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from warnings import warn
 
 from .pot import Pot
 from .ingredient import (
+    _RootIngredient,
     Ingredient,
     _OrderedIngredientProxy,
     IngredientProxy,
-    IngredientData,
-    NoCallIngredient
+    IngredientData
 )
 
 
 _B = TypeVar("_B")
+_IPT = TypeVar("_IPT")
 
 
 class Kitchen:
 
+    @dataclass
+    class Chef(ABC):
+
+        kitchen: "Kitchen"
+
+        @abstractmethod
+        def prepare(self,
+                    ingredient: Ingredient) -> Ingredient: ...
+
+        @abstractmethod
+        def cook(self,
+                 line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]: ...
+
+    @dataclass
+    class ChefLine:
+
+        kitchen: "Kitchen"
+        chefs: list["Kitchen.Chef"]
+
+        def __post_init__(self) -> None:
+            self.chefs = [chef(self.kitchen) for chef in self.chefs]
+
+        def add(self, chef: "Kitchen.Chef") -> None:
+            self.chefs.append(chef(self.kitchen))
+
+        def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
+            for _chef in self.chefs:
+                line = _chef.cook(line)
+            return line
+
+        def prepare(self, ingredient: Ingredient) -> Ingredient:
+            for _chef in self.chefs:
+                ingredient = _chef.prepare(ingredient)
+            return ingredient
+
     pot: Pot
     chefLine: ChefLine
 
-    def __init__(self, pot: Pot, chefLine: ChefLine) -> None:
+    def __init__(self, pot: Pot, chefs: list[type[Chef]]) -> None:
         self.pot = pot
-        self.chefLine = chefLine
+        self.chefLine = Kitchen.ChefLine(self, chefs)
 
-    def prepare(self, _f: _B = None, /,
-                lazy: bool = False, order: int = inf,
-                primary: bool = False, _id: str = None,
-                no_call: bool = False) -> _B:
-        def _wrapper(_f) -> Ingredient:
-            # Not so pypotonic as it should be :(
-            ingredient = self.pot.create(
-                _f, lazy=lazy,
-                _ingredient=NoCallIngredient if no_call else Ingredient,
-                order=order, primary=primary,
-                _id=_id)
+    def prepare(
+            self,
+            _f: Union[Callable, Ingredient] = None,
+            /, **kwargs) -> Callable:
+        def _wrapper(_f: Union[Callable, Ingredient]) -> Ingredient:
+            if kwargs:
+                warn("kwargs are not supported in the prepare decorator")
 
-            self.pot.add(
-                self.chefLine.prepare(ingredient))
-            return _f
+            ingredient = _RootIngredient(_f)
+
+            line = [
+                ingredient
+                for ingredient
+                in ingredient
+                if type(ingredient) is not Ingredient][:-1]
+            _f = line[-1].decorator
+            line.sort(key=lambda x: x.priority)
+            last = line[-1]
+            last._decorator = _f
+            for next in line[:-1][::-1]:
+                next._decorator = last
+                last = next
+
+            ingredient.formula._type = ingredient.type
+            prepared_ingredient = self.chefLine.prepare(ingredient)
+
+            self.pot.add(prepared_ingredient)
+
+            return ingredient.decorator
         return _wrapper(_f) if _f is not None else _wrapper
 
     def cook(self, _type: _B, _id: str = None) -> IngredientProxy[_B]:
@@ -51,3 +101,12 @@ class Kitchen:
             formula=IngredientData(_type=_t, _id=_id))
 
         return self.chefLine.cook(chef_line)
+
+
+# Allows for direct import of the classes
+class Chef(Kitchen.Chef):
+    ...
+
+
+class ChefLine(Kitchen.ChefLine):
+    ...

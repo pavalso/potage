@@ -25,15 +25,18 @@ def test_prepare_list():
 
 
 def test_prepare_list_ordered():
-    @pypotage.prepare(order=1)
+    @pypotage.prepare
+    @pypotage.order(1)
     def bean1() -> str:
         return "bean1"
 
-    @pypotage.prepare(order=2)
+    @pypotage.prepare
+    @pypotage.order(2)
     def bean2() -> str:
         return "bean2"
 
-    @pypotage.prepare(order=3)
+    @pypotage.prepare
+    @pypotage.order(3)
     def bean3():
         return "bean3"
 
@@ -41,7 +44,8 @@ def test_prepare_list_ordered():
 
 
 def test_prepare_list_primary():
-    @pypotage.prepare(primary=True)
+    @pypotage.prepare
+    @pypotage.primary
     def bean1() -> str:
         return "bean1"
 
@@ -65,7 +69,8 @@ def test_prepare_lazy_list():
         def __init__(self):
             raise Exception("Should be called on take_out() (On lazy beans)")
 
-    @pypotage.prepare(lazy=True)
+    @pypotage.prepare
+    @pypotage.lazy
     def bean() -> Bean:
         return Bean()
 
@@ -76,9 +81,7 @@ def test_prepare_lazy_list():
 def test_list_chef_solo():
     kitchen_ = pypotage.Kitchen(
         pypotage.Pot(),
-        pypotage.ChefLine([
-            pypotage.chefs.ListChef()
-        ])
+        [pypotage.chefs.ListChef]
     )
 
     @kitchen_.prepare

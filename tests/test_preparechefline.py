@@ -7,11 +7,11 @@ class _TestChef(pypotage.Chef):
     def prepare(self, ingredient):
         ingredient.formula._id = "test"
         ingredient.formula._type = str
-        return super().prepare(ingredient)
+        return ingredient
 
     def cook(self, line):
         line.formula._type = str
-        return super().cook(line)
+        return line
 
 
 @pytest.fixture(autouse=True)
@@ -26,7 +26,7 @@ def test_preparechefline_works():
 
     assert pypotage.cook(int).take_out() == 1
 
-    pypotage.kitchen_.chefLine.add(_TestChef())
+    pypotage.kitchen_.chefLine.add(_TestChef)
 
     @pypotage.prepare
     def bean_2():

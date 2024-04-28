@@ -1,6 +1,6 @@
 from typing import Generic
 
-from ..chef import Chef
+from ..kitchen import Kitchen
 from ..ingredient import IngredientProxy, _B, IngredientData, Ingredient
 
 
@@ -20,7 +20,7 @@ class _GenericIngredientProxy(IngredientProxy[_B]):
         return ingredients
 
 
-class GenericChef(Chef):
+class GenericChef(Kitchen.Chef):
 
     def _is_generic(self, _type: type) -> bool:
         return isinstance(_type, type) and \

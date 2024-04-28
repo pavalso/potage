@@ -1,29 +1,46 @@
 from . import ingredient as ingredients
 
 from .pot import Pot
-from .kitchen import Kitchen
+from .kitchen import (  # noqa: F401
+    Kitchen,
+    ChefLine,
+    Chef
+)
+from .decorators import (
+    lazy,
+    no_call,
+    id,
+    order,
+    primary,
+    type,
+    ingredient
+)
 
-from .chef import Chef
 from . import chefsImpl as chefs
-from .chefLine import ChefLine
 
 
 kitchen_ = Kitchen(
     Pot(),
-    ChefLine([chefs.ListChef(), chefs.GenericChef()])
+    [chefs.ListChef, chefs.GenericChef]
 )
 
 prepare = kitchen_.prepare
 cook = kitchen_.cook
 
-
 __all__ = [
     "prepare",
     "cook",
-    "Chef",
     "ingredients",
     "Pot",
     "Kitchen",
+    "Chef"
     "ChefLine",
     "chefs",
+    "lazy",
+    "no_call",
+    "id",
+    "order",
+    "primary",
+    "type",
+    "ingredient"
 ]

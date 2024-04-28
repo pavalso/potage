@@ -1,87 +1,120 @@
-from typing import Generic, TypeVar, Callable, Any
+from typing import (
+    Generic,
+    TypeVar,
+    Callable,
+    Any,
+    Union
+)
 from dataclasses import dataclass, field
-from math import inf
 from inspect import isclass
+from math import inf
+from functools import cache
 
 from typing_extensions import deprecated
+
+from .utils import Decorable
 
 
 _B = TypeVar("_B")
 
 
-@dataclass(repr=False)
+@dataclass
 class IngredientData:
 
     _type: Any = None
     _id: str = None
     lazy: bool = False
-    order: int = inf
+    order: int = 999999
     primary: bool = False
     extra: dict = field(default_factory=dict)
 
 
-@dataclass(repr=False)
-class Ingredient:
-
-    _c: Callable
+class Ingredient(Decorable):
 
     formula: IngredientData
 
     @property
     def priority(self) -> int:
-        return -inf if self.formula.primary else self.formula.order
+        return 0
 
     @property
     def type(self) -> Any:
-        _annotation = None if not hasattr(self._c, "__annotations__") else \
-            self._c.__annotations__.get("return")
+        if self.formula._type is not None:
+            return self.formula._type
+        if not self.decorator == self.last:
+            return self.decorator.type
+        return None
+
+    def __init__(self, _c: Union["Ingredient", Callable]) -> None:
+        super().__init__(_c)
+        self.formula = _c.formula \
+            if isinstance(_c, Ingredient) \
+            else IngredientData()
+
+    @cache
+    def __call__(self) -> Any:
+        return self.decorator()
+
+
+class TypedIngredient(Ingredient):
+
+    @property
+    def type(self) -> Any:
+        _type = super().type
+
+        if _type is not None:
+            return _type
+
+        _annotation = None if not hasattr(self.last, "__annotations__") else \
+            self.last.__annotations__.get("return")
 
         if _annotation is not None:
             return _annotation
 
-        if hasattr(self._c.__wrapped__, "__origin__"):
-            return self._c.__wrapped__
+        if hasattr(self.last, "__origin__"):
+            return self.last
 
-        if self.formula.lazy:
-            if isclass(self._c.__wrapped__):
-                return self._c.__wrapped__
+        if isclass(self.last):
+            return self.last
 
-            raise RuntimeError("Lazy ingredients must explicitly \
-                define their return type")
-
-        return type(self._c())
-
-    def __call__(self):
-        return self._c()
+        return None
 
 
-class NoCallIngredient(Ingredient):
+class _RootIngredient(TypedIngredient):
 
-    def __init__(self, _c: Callable, formula: IngredientData) -> None:
-        def _nocall(*args, **kwargs):
-            return _c
-        self.__wrapped__ = _c
-        if hasattr(_c, "__annotations__"):
-            _nocall.__annotations__ = _c.__annotations__
-        _nocall.__wrapped__ = _c.__wrapped__
-        super().__init__(_nocall, formula)
+    @property
+    def priority(self) -> int:
+        return -inf
 
     @property
     def type(self) -> Any:
-        if isclass(self._c.__wrapped__):
-            return self._c.__wrapped__
+        return super().type or type(self())
 
-        _annotation = None if not hasattr(self._c, "__annotations__") else \
-            self._c.__annotations__.get("return")
 
-        if _annotation is not None:
-            return _annotation
+class LazyIngredient(TypedIngredient):
 
-        if hasattr(self._c.__wrapped__, "__origin__"):
-            return self._c.__wrapped__
+    def __init__(self, _c: Callable) -> None:
+        super().__init__(_c)
+        self.formula.lazy = True
 
-        raise RuntimeError(
-            "No call ingredients must explicitly be annotated or wrap a class")
+    @property
+    def type(self) -> type:
+        type_ = super().type
+
+        if type_ is not None:
+            return type_
+
+        raise RuntimeError("Lazy ingredients must explicitly define a type")
+
+
+class NoCallIngredient(LazyIngredient):
+
+    @property
+    def priority(self) -> int:
+        return 100
+
+    def __call__(self) -> None:
+        return self.decorator
 
 
 @dataclass(repr=False)
@@ -119,7 +152,10 @@ class _OrderedIngredientProxy(_RootIngredientProxy):
     def __call__(self, formula: IngredientData) -> list[Ingredient]:
         _ingredients = super().__call__(formula)
 
-        _ingredients = sorted(_ingredients, key=lambda x: x.priority)
+        _ingredients = sorted(
+            _ingredients,
+            key=lambda x: -inf if x.formula.primary else x.formula.order
+        )
 
         return _ingredients
 

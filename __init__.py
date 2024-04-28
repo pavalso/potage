@@ -2,12 +2,15 @@ from src import pypotage
 
 
 if __name__ == "__main__":
-    @pypotage.prepare(no_call=True)
+    @pypotage.prepare
+    @pypotage.no_call
     class Test:
         def __init__(self):
             print("Test.__init__")
 
-    @pypotage.prepare(no_call=True, lazy=True)
+    @pypotage.prepare
+    @pypotage.no_call
+    @pypotage.lazy
     def test() -> str:
         print("test")
         return "test"
