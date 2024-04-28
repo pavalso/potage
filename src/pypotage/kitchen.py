@@ -89,7 +89,7 @@ class Kitchen:
 
             self.pot.add(prepared_ingredient)
 
-            return ingredient.decorator
+            return ingredient.last
         return _wrapper(_f) if _f is not None else _wrapper
 
     def cook(self, _type: _B, _id: str = None) -> IngredientProxy[_B]:

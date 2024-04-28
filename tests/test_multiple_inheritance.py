@@ -7,7 +7,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.pot.ingredients.clear()
+    pypotage.kitchen_.pot.ingredients.clear()
 
 
 def test_1depth_multiple_inheritance():
@@ -42,7 +42,8 @@ def test_2depth_multiple_inheritance():
     class Child(Parent1, Parent2):
         pass
 
-    @pypotage.prepare(primary=True)
+    @pypotage.prepare
+    @pypotage.primary
     class GrandChild(Child):
         pass
 
