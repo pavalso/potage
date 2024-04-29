@@ -12,32 +12,50 @@ class _GenericIngredientProxy(IngredientProxy[_B]):
     def __call__(self, formula: IngredientData) -> list[Ingredient]:
         ingredients = super().__call__(formula)
 
-        ingredients = [
-            ingredient for ingredient in ingredients
-            if self._get_generic_type(self.formula)
-            == self._get_generic_type(ingredient.formula)]
+        if not ingredients:
+            return ingredients
 
-        return ingredients
+        _bases = self._get_generic_type(self.formula)
+
+        if _bases is None:
+            return ingredients
+
+        _matches = []
+        for ingredient in ingredients:
+            _ingredient_bases = self._get_generic_type(ingredient.formula)
+            for _ingredient_type, _ingredient_args in _ingredient_bases:
+                for _type, args in _bases:
+                    if not issubclass(_ingredient_type, _type):
+                        continue
+                    if args != _ingredient_args:
+                        continue
+                    _matches.append(ingredient)
+
+        return _matches
 
 
 class GenericChef(Kitchen.Chef):
 
-    def _is_generic(self, _type: type) -> bool:
+    @staticmethod
+    def _is_generic(_type: type) -> bool:
         return isinstance(_type, type) and \
             issubclass(_type, Generic) or \
             hasattr(_type, "__origin__") and \
             issubclass(_type.__origin__, Generic)
 
-    def _modify_formula(self, formula: IngredientData) -> IngredientData:
-        generic_type = None
-        _type = formula._type
+    @staticmethod
+    def _get_bases(_type: type) -> list[tuple[type, tuple[type]]]:
+        if hasattr(_type, "__origin__"):
+            return [(_type.__origin__, _type.__args__)]
+        bases = _type.__orig_bases__
+        return [(base.__origin__, base.__args__) for base in bases]
+
+    @staticmethod
+    def _modify_formula(formula: IngredientData) -> IngredientData:
+        formula.extra["__generic_type__"] = \
+            GenericChef._get_bases(formula._type)
         if hasattr(formula._type, "__origin__"):
-            generic_type = formula._type.__args__
-            _type = formula._type.__origin__
-        elif hasattr(formula._type, "__orig_bases__"):
-            generic_type = formula._type.__orig_bases__[0].__args__
-        formula.extra["__generic_type__"] = generic_type
-        formula._type = _type
+            formula._type = formula._type.__origin__
         return formula
 
     def prepare(self,

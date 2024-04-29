@@ -69,6 +69,8 @@ def test_generic_multiple_inheritance():
         pass
 
     assert isinstance(pypotage.cook(Child).take_out(), Child)
+    assert isinstance(pypotage.cook(Parent1).take_out(), Child)
+    assert isinstance(pypotage.cook(Parent2).take_out(), Child)
 
     @pypotage.prepare
     class SpecificChild(Parent1[int], Parent2[str]):
@@ -81,3 +83,41 @@ def test_generic_multiple_inheritance():
     assert isinstance(pypotage.cook(Parent2[str]).take_out(), SpecificChild)
     pytest.raises(RuntimeError, lambda:
                   pypotage.cook(Parent2[int]).take_out())
+
+
+def test_generic_multiple_inheritance_list():
+    T = TypeVar("T")
+
+    class Parent1(Generic[T]):
+        def test1(self):
+            return "Parent1.test"
+
+    class Parent2(Generic[T]):
+        def test2(self):
+            return "Parent2.test"
+
+    @pypotage.prepare
+    @pypotage.no_call
+    class Child(Parent1, Parent2):
+        pass
+
+    @pypotage.prepare
+    @pypotage.no_call
+    class SpecificChild(Parent1[int], Parent2[str]):
+        pass
+
+    assert SpecificChild in pypotage.cook(list[Parent1[int]]).take_out()
+    assert SpecificChild in pypotage.cook(list[Parent2[str]]).take_out()
+    assert SpecificChild not in pypotage.cook(list[Parent1[str]]).take_out()
+    assert SpecificChild not in pypotage.cook(list[Parent2[int]]).take_out()
+
+    assert Child in pypotage.cook(list[Parent1]).take_out()
+    assert Child not in pypotage.cook(list[Parent1[int]]).take_out()
+
+    @pypotage.prepare
+    @pypotage.no_call
+    class ChildOfSpecificChild(SpecificChild):
+        pass
+
+    assert ChildOfSpecificChild in pypotage.cook(list[Parent1[int]]).take_out()
+    assert ChildOfSpecificChild in pypotage.cook(list[Parent2[str]]).take_out()
