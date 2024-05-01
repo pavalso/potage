@@ -6,15 +6,35 @@
 Welcome to pypotage's documentation!
 ====================================
 
+A simple Python package that provides an easy way to use Dependency Injection in your projects.
+
+.. image:: https://i.imgur.com/7eK0mHJ.png
+
+
+Features
+----------------
+
+- Easy to use
+- Supports both function and class-based dependency injection
+- Allows customizing the way dependencies are resolved
+- Allows for the use of custom containers
+
+
+Getting Started
+----------------
+
+Here you can find a set of documents to help you get started with pypotage.
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
 
+   installation
+   basic_usage
 
+Manuals
+----------------
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 1
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   api_reference
