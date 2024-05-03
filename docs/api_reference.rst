@@ -8,31 +8,22 @@ Ingredients
     :members:
     :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 .. autoclass:: pypotage.ingredient.TypedIngredient
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 .. autoclass:: pypotage.ingredient._RootIngredient
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 .. autoclass:: pypotage.ingredient.LazyIngredient
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 .. autoclass:: pypotage.ingredient.NoCallIngredient
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 
 Ingredient Proxies
@@ -45,15 +36,11 @@ Ingredient Proxies
 
 .. autoclass:: pypotage.ingredient._RootIngredientProxy
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 .. autoclass:: pypotage.ingredient._OrderedIngredientProxy
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 
 Ingredient Data
@@ -75,9 +62,7 @@ Chefs
 
 .. automodule:: pypotage.chefs
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:
 
 
 Kitchen
