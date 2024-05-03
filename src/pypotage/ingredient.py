@@ -10,8 +10,6 @@ from inspect import isclass
 from math import inf
 from functools import cache
 
-from typing_extensions import deprecated
-
 from .utils import Decorable
 
 
@@ -158,18 +156,3 @@ class _OrderedIngredientProxy(_RootIngredientProxy):
         )
 
         return _ingredients
-
-
-@deprecated("Use `Ingredient` instead")
-class _Ingredient(Ingredient):
-    ...
-
-
-@deprecated("Use `IngredientProxy` instead")
-class _IngredientProxy(IngredientProxy):
-    ...
-
-
-@deprecated("Use `OrderedIngredientProxy` instead")
-class _IngredientData(IngredientData):
-    ...
