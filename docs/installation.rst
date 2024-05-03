@@ -1,8 +1,8 @@
 Installation Guide
-==================
+#####################
 
 Latest Release
---------------
+====================
 
 Pypotage installation is pretty straightforward. You can install the latest release using pip:
 
@@ -20,7 +20,7 @@ That's all you need to do to install the latest version of the package. You can 
 
 
 Development Version
--------------------
+====================
 
 In case you want to check out the latest features or wanna contribute to the project,
 you can install the latest development version from the GitHub repository:

@@ -1,15 +1,8 @@
 Basic Usage
-===========
-
-.. toctree:: 
-   :maxdepth: 1
-   :hidden:
-
-   basic_usage/prepare_ingredients
-   basic_usage/cooking_ingredients
+#####################
 
 How pypotage works?
--------------------
+====================
 
 **Pypotage** is a python package that makes it easier for developers to use **Dependency Injection** in their code. 
 
@@ -19,7 +12,7 @@ How pypotage works?
    In the context of this package, we will refer to the container as the **pot** and the dependencies as the **ingredients**. 
 
 Preparing the Ingredients
--------------------------
+=========================
 
 To use **pypotage**, you need to **prepare the ingredients** that you will be using in your code. These ingredients are the dependencies that you will be injecting into your codebase. So let's **prepare the ingredients** first.
 
@@ -43,7 +36,7 @@ This is achieved by using the **@pypotage.prepare** decorator.
 Now we have a Logger prepared to use in any part of our codebase.
 
 Cooking the Ingredients
------------------------
+=======================
 
 To **inject the ingredients** into the codebase, you need to use the **pypotage.cook** function.
 
@@ -59,7 +52,8 @@ In the following example, we will inject the ingredient into a function of anoth
 
 Now when this function is called, the ingredient will be injected into the function.
 
-**Full Example**
+Full Example
+====================
 
 `__init__.py`
 

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to pypotage's documentation!
-====================================
+####################################
 
 A simple Python package that provides an easy way to use Dependency Injection in your projects.
 
@@ -12,7 +12,7 @@ A simple Python package that provides an easy way to use Dependency Injection in
 
 
 Features
-----------------
+====================
 
 - Easy to use
 - Supports both function and class-based dependency injection
@@ -21,7 +21,7 @@ Features
 
 
 Getting Started
-----------------
+====================
 
 Here you can find a set of documents to help you get started with pypotage.
 
@@ -32,7 +32,7 @@ Here you can find a set of documents to help you get started with pypotage.
    basic_usage
 
 Manuals
-----------------
+====================
 
 .. toctree::
    :maxdepth: 1
