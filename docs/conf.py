@@ -17,7 +17,6 @@ author = 'pavalso'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx_wagtail_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon'
 ]
@@ -29,8 +28,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_wagtail_theme'
+html_theme = 'press'
 html_static_path = ['_static']
+html_css_files = ['potage_theme.css']
 
 html_theme_options = {
     "project_name": "Pypotage",

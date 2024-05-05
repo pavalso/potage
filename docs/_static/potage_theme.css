@@ -1,0 +1,29 @@
+:root {
+    --primary: #009eff;
+    --secondary: #9fdaff;
+    --font-color: #e9e9e9;
+}
+
+a {
+    color: var(--primary);
+}
+
+/* Toctree current selected item */
+.vp-sidebar .toctree-l1 a.current {
+    border-left-color: var(--primary) !important;
+}
+
+/* Toctree current items subitems */
+.vp-sidebar .toctree-l1.current a {
+    border-left: .5rem solid var(--secondary);
+}
+
+/* Current toctree selected item */
+.vp-sidebar .toctree-l1 a.current, .vp-sidebar .toctree-l2 a.current {
+    color: var(--primary);
+}
+
+/* Hover on toctree items */
+.vp-sidebar .toctree-l1 a:hover, .vp-sidebar .toctree-l2 a:hover {
+    color: var(--secondary);
+}
