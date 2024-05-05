@@ -35,7 +35,9 @@ html_favicon = 'images/favicon.ico'
 
 html_theme_options = {
     "project_name": "Pypotage",
-    "logo_alt": "Pypotage",
+    "external_links": [
+      ("Github", "https://github.com/pavalso/potage")
+    ]
 }
 
 sys.path.insert(0, os.path.abspath('../src'))
