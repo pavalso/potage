@@ -4,6 +4,7 @@ from typing import (
     Iterator,
     Union)
 from abc import ABC, abstractmethod
+from enum import IntEnum
 
 
 def traverse_subclasses(cls) -> list:
@@ -16,6 +17,14 @@ def traverse_subclasses(cls) -> list:
         subclasses.extend(traverse_subclasses(subclass))
 
     return subclasses
+
+
+class Priority(IntEnum):
+    LAST = 0
+    BEFORE_LAST = 10000
+    MIDDLE = 20000
+    AFTER_FIRST = 30000
+    FIRST = 40000
 
 
 # Not thread safe
@@ -57,3 +66,13 @@ class Decorable(ABC, Iterable):
         if _r is not None:
             return _r
         raise StopIteration
+
+    @staticmethod
+    def sort(decorable: "Decorable") -> "Decorable":
+        line: list[Decorable] = list(decorable)[:-1]
+        last = decorable.last
+        line.sort(key=lambda x: x.priority)
+        for next in line:
+            next._decorator = last
+            last = next
+        return line[-1]

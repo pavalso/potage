@@ -1,10 +1,10 @@
 from typing import Generic
 
 from ..kitchen import Chef
-from ..ingredient import IngredientProxy, _B, IngredientData, Ingredient
+from ..ingredient import IngredientProxy, IngredientData, Ingredient, _B
 
 
-class _GenericIngredientProxy(IngredientProxy[_B]):
+class _GenericIngredientProxy(IngredientProxy):
 
     def _get_generic_type(self, formula: IngredientData) -> type:
         return formula.extra.get("__generic_type__")

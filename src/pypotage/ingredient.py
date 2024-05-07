@@ -10,7 +10,7 @@ from inspect import isclass
 from math import inf
 from functools import cache
 
-from .utils import Decorable
+from .utils import Decorable, Priority
 
 
 _B = TypeVar("_B")
@@ -33,7 +33,7 @@ class Ingredient(Decorable):
 
     @property
     def priority(self) -> int:
-        return 0
+        return Priority.MIDDLE
 
     @property
     def type(self) -> Any:
@@ -82,7 +82,7 @@ class _RootIngredient(TypedIngredient):
 
     @property
     def priority(self) -> int:
-        return -inf
+        return inf
 
     @property
     def type(self) -> Any:
@@ -107,20 +107,24 @@ class LazyIngredient(TypedIngredient):
 
 class NoCallIngredient(LazyIngredient):
 
-    @property
-    def priority(self) -> int:
-        return 100
-
     def __call__(self) -> None:
         return self.decorator
 
 
-@dataclass(repr=False)
-class IngredientProxy(Generic[_B]):
-
-    _f: "IngredientProxy"
+class IngredientProxy(Decorable, Generic[_B]):
 
     formula: IngredientData
+
+    @property
+    def priority(self) -> int:
+        return Priority.MIDDLE
+
+    def __init__(
+            self,
+            _f: Union[Callable, "IngredientProxy"],
+            formula: IngredientData = None) -> None:
+        super().__init__(_f)
+        self.formula = formula
 
     def is_present(self) -> bool:
         return bool(self(self.formula))
@@ -128,15 +132,17 @@ class IngredientProxy(Generic[_B]):
     def take_out(self, __ingredients: list[Ingredient] = None) -> _B:
         if __ingredients is None:
             __ingredients = self(self.formula)
-        return self._f.take_out(__ingredients)
+        return self.decorator.take_out(__ingredients)
 
     def __call__(self, formula: IngredientData) -> list[Ingredient]:
-        return self._f(formula)
+        return self.decorator(formula)
 
 
 class _RootIngredientProxy(IngredientProxy):
 
-    _f: Callable
+    @property
+    def priority(self) -> int:
+        return -inf
 
     def take_out(self, __ingredients: list[Ingredient] = None) -> Any:
         if __ingredients == []:

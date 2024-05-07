@@ -1,8 +1,13 @@
 from ..kitchen import Chef
 from ..ingredient import IngredientProxy, _B, Ingredient
+from ..utils import Priority
 
 
 class _ListIngredientProxy(IngredientProxy):
+
+    @property
+    def priority(self) -> int:
+        return Priority.LAST
 
     def take_out(self, __ingredients: list[Ingredient] = None) -> list[_B]:
         if __ingredients is None:

@@ -11,6 +11,7 @@ from .ingredient import (
     IngredientProxy,
     IngredientData
 )
+from .utils import Decorable
 
 
 _B = TypeVar("_B")
@@ -71,20 +72,7 @@ class Kitchen:
             if kwargs:
                 warn("kwargs are not supported in the prepare decorator")
 
-            ingredient = _RootIngredient(_f)
-
-            line = [
-                ingredient
-                for ingredient
-                in ingredient
-                if type(ingredient) is not Ingredient][:-1]
-            _f = line[-1].decorator
-            line.sort(key=lambda x: x.priority)
-            last = line[-1]
-            last._decorator = _f
-            for next in line[:-1][::-1]:
-                next._decorator = last
-                last = next
+            ingredient = Decorable.sort(_RootIngredient(_f))
 
             ingredient.formula._type = ingredient.type
             prepared_ingredient = self.chefLine.prepare(ingredient)
@@ -102,4 +90,4 @@ class Kitchen:
             _f=self.pot.get,
             formula=IngredientData(_type=_t, _id=_id))
 
-        return self.chefLine.cook(chef_line)
+        return Decorable.sort(self.chefLine.cook(chef_line))
