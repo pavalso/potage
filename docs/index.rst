@@ -41,4 +41,5 @@ Manuals
 .. toctree::
    :maxdepth: 1
 
+   full_guide
    api_reference

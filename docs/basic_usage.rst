@@ -52,6 +52,8 @@ In the following example, we will inject the ingredient into a function of anoth
 
 Now when this function is called, the ingredient will be injected into the function.
 
+**This is all you need to know to get started with pypotage**, but there are more advanced features that you can learn about in the :doc:`/full_guide` section.
+
 Full Example
 ====================
 

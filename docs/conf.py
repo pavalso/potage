@@ -34,7 +34,6 @@ html_css_files = ['potage_theme.css']
 html_favicon = 'images/favicon.ico'
 
 html_theme_options = {
-    "project_name": "Pypotage",
     "external_links": [
       ("Github", "https://github.com/pavalso/potage")
     ]
