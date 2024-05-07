@@ -1,4 +1,4 @@
-from ..kitchen import Kitchen
+from ..kitchen import Chef
 from ..ingredient import IngredientProxy, _B, Ingredient
 
 
@@ -11,7 +11,7 @@ class _ListIngredientProxy(IngredientProxy):
         return [ingredient() for ingredient in __ingredients]
 
 
-class ListChef(Kitchen.Chef):
+class ListChef(Chef):
 
     def prepare(self, ingredient: Ingredient) -> Ingredient:
         return ingredient

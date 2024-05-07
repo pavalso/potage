@@ -17,49 +17,51 @@ _B = TypeVar("_B")
 _IPT = TypeVar("_IPT")
 
 
+@dataclass
+class Chef(ABC):
+
+    kitchen: "Kitchen"
+
+    @abstractmethod
+    def prepare(self,
+                ingredient: Ingredient) -> Ingredient: ...
+
+    @abstractmethod
+    def cook(self,
+             line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]: ...
+
+
+@dataclass
+class ChefLine:
+
+    kitchen: "Kitchen"
+    chefs: list[Chef]
+
+    def __post_init__(self) -> None:
+        self.chefs = [chef(self.kitchen) for chef in self.chefs]
+
+    def add(self, chef: Chef) -> None:
+        self.chefs.append(chef(self.kitchen))
+
+    def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
+        for _chef in self.chefs:
+            line = _chef.cook(line)
+        return line
+
+    def prepare(self, ingredient: Ingredient) -> Ingredient:
+        for _chef in self.chefs:
+            ingredient = _chef.prepare(ingredient)
+        return ingredient
+
+
 class Kitchen:
-
-    @dataclass
-    class Chef(ABC):
-
-        kitchen: "Kitchen"
-
-        @abstractmethod
-        def prepare(self,
-                    ingredient: Ingredient) -> Ingredient: ...
-
-        @abstractmethod
-        def cook(self,
-                 line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]: ...
-
-    @dataclass
-    class ChefLine:
-
-        kitchen: "Kitchen"
-        chefs: list["Kitchen.Chef"]
-
-        def __post_init__(self) -> None:
-            self.chefs = [chef(self.kitchen) for chef in self.chefs]
-
-        def add(self, chef: "Kitchen.Chef") -> None:
-            self.chefs.append(chef(self.kitchen))
-
-        def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
-            for _chef in self.chefs:
-                line = _chef.cook(line)
-            return line
-
-        def prepare(self, ingredient: Ingredient) -> Ingredient:
-            for _chef in self.chefs:
-                ingredient = _chef.prepare(ingredient)
-            return ingredient
 
     pot: Pot
     chefLine: ChefLine
 
     def __init__(self, pot: Pot, chefs: list[type[Chef]]) -> None:
         self.pot = pot
-        self.chefLine = Kitchen.ChefLine(self, chefs)
+        self.chefLine = ChefLine(self, chefs)
 
     def prepare(
             self,
@@ -101,12 +103,3 @@ class Kitchen:
             formula=IngredientData(_type=_t, _id=_id))
 
         return self.chefLine.cook(chef_line)
-
-
-# Allows for direct import of the classes
-class Chef(Kitchen.Chef):
-    ...
-
-
-class ChefLine(Kitchen.ChefLine):
-    ...

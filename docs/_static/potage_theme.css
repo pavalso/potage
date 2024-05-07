@@ -1,0 +1,117 @@
+:root {
+    --primary: #009eff;
+    --secondary: #9fdaff;
+    --font-color: #e9e9e9;
+}
+
+.theme-light {
+    --text-color: #2c3e50;
+    --background-color: #fff;
+    --border-color: #eaecef;
+    --code-bg-color: #ecf4fa;
+    --arrow-bg-color: #ccc;
+    --box-shadow-color: #f0f1f2;
+    --text-color-l10: #3a5169;
+    --text-color-l20: #476582;
+    --text-color-l25: #4e6e8e;
+    --text-color-l40: #6a8bad;
+    --black: #000;
+    --dark-grey: #666;
+    --light-grey: #999;
+    --white: #fff;
+    --grey3: #333;
+    --grey12: #bbb;
+    --grey14: #eee;
+}
+
+.theme-dark {
+    --text-color: #9e9e9e;
+    --background-color: #1e1e1e;
+    --border-color: #302d28;
+    --code-bg-color: #282c34;
+    --arrow-bg-color: #333;
+    --box-shadow-color: #0f0e0d;
+    --text-color-l10: #a8a8a8;
+    --text-color-l20: #b1b1b1;
+    --text-color-l25: #b6b6b6;
+    --text-color-l40: #c5c5c5;
+    --black: #fff;
+    --dark-grey: #999;
+    --light-grey: #666;
+    --white: #000;
+    --grey3: #ccc;
+    --grey12: #333;
+    --grey14: #111;
+}
+
+@media (min-width: 719px) {
+    .nav-item>a:not(.external):hover, .nav-item>a:not(.external).router-link-active {
+        border-bottom: 2px solid var(--primary)
+    }
+}
+
+@media (max-width: 719px) {
+    .nav-links a:hover, .nav-links a.router-link-active {
+        color: var(--primary);
+    }
+}
+
+.admonition {
+    color: #000 !important;
+}
+
+.admonition.tip,.admonition.hint {
+    background-color: #f3f5f7;
+}
+
+.admonition.important,.admonition.note {
+    background-color: #94ceff;
+}
+
+.admonition.warning,.admonition.caution {
+    background-color: #ffe564;
+}
+
+.admonition.danger,.admonition.error {
+    background-color: #ff6767;
+}
+
+.darkmode-switch .item .icon {
+    fill: var(--primary);
+}
+
+.darkmode-switch .item:first-child {
+    border-left: 1px solid var(--primary);
+}
+
+.darkmode-switch .item.active {
+    background-color: var(--primary);
+}
+
+.darkmode-switch .item {
+    border: 1px solid var(--primary);
+}
+
+a {
+    color: var(--primary);
+}
+
+/* Toctree current selected item */
+.vp-sidebar .toctree-l1 a.current {
+    border-left-color: var(--primary) !important;
+}
+
+/* Toctree current items subitems */
+.vp-sidebar .toctree-l1.current a {
+    border-left: .5rem solid var(--secondary);
+}
+
+/* Current toctree selected item */
+.vp-sidebar .toctree-l1 a.current, .vp-sidebar .toctree-l2 a.current {
+    color: var(--primary);
+}
+
+/* Hover on toctree items */
+.vp-sidebar .toctree-l1 a:hover, .vp-sidebar .toctree-l2 a:hover {
+    color: var(--secondary);
+}
