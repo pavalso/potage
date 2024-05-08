@@ -22,9 +22,18 @@ class IngredientData:
     _type: Any = None
     _id: str = None
     lazy: bool = False
-    order: int = 999999
     primary: bool = False
     extra: dict = field(default_factory=dict)
+
+    __order: int = inf
+
+    @property
+    def order(self) -> int:
+        return -inf if self.primary else self.__order
+
+    @order.setter
+    def order(self, value: int) -> None:
+        self.__order = value
 
 
 class Ingredient(Decorable):
@@ -158,7 +167,7 @@ class _OrderedIngredientProxy(_RootIngredientProxy):
 
         _ingredients = sorted(
             _ingredients,
-            key=lambda x: -inf if x.formula.primary else x.formula.order
+            key=lambda x: x.formula.order
         )
 
         return _ingredients
