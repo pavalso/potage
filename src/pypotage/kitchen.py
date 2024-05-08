@@ -11,7 +11,7 @@ from .ingredient import (
     IngredientProxy,
     IngredientData
 )
-from .utils import Decorable
+from .utils import Decorable, Priorized
 
 
 _B = TypeVar("_B")
@@ -19,9 +19,7 @@ _IPT = TypeVar("_IPT")
 
 
 @dataclass
-class Chef(ABC):
-
-    kitchen: "Kitchen"
+class Chef(Priorized, ABC):
 
     @abstractmethod
     def prepare(self,
@@ -39,10 +37,11 @@ class ChefLine:
     chefs: list[Chef]
 
     def __post_init__(self) -> None:
-        self.chefs = [chef(self.kitchen) for chef in self.chefs]
+        self.chefs = Priorized.sort(self.chefs, reverse=True)
 
     def add(self, chef: Chef) -> None:
-        self.chefs.append(chef(self.kitchen))
+        self.chefs.append(chef)
+        self.chefs = Priorized.sort(self.chefs, reverse=True)
 
     def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
         for _chef in self.chefs:
@@ -60,7 +59,7 @@ class Kitchen:
     pot: Pot
     chefLine: ChefLine
 
-    def __init__(self, pot: Pot, chefs: list[type[Chef]]) -> None:
+    def __init__(self, pot: Pot, chefs: list[Chef]) -> None:
         self.pot = pot
         self.chefLine = ChefLine(self, chefs)
 
@@ -72,7 +71,7 @@ class Kitchen:
             if kwargs:
                 warn("kwargs are not supported in the prepare decorator")
 
-            ingredient = Decorable.sort(_RootIngredient(_f))
+            ingredient: Ingredient = Decorable.sort(_RootIngredient(_f))
 
             ingredient.formula._type = ingredient.type
             prepared_ingredient = self.chefLine.prepare(ingredient)

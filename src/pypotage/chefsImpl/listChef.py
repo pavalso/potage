@@ -7,7 +7,7 @@ class _ListIngredientProxy(IngredientProxy):
 
     @property
     def priority(self) -> int:
-        return Priority.LAST
+        return Priority.FIRST
 
     def take_out(self, __ingredients: list[Ingredient] = None) -> list[_B]:
         if __ingredients is None:
@@ -17,6 +17,10 @@ class _ListIngredientProxy(IngredientProxy):
 
 
 class ListChef(Chef):
+
+    @property
+    def priority(self) -> int:
+        return Priority.FIRST
 
     def prepare(self, ingredient: Ingredient) -> Ingredient:
         return ingredient

@@ -3,7 +3,7 @@ from typing import (
     Iterable,
     Iterator,
     Union)
-from abc import ABC, abstractmethod
+from abc import ABC
 from enum import IntEnum
 
 
@@ -27,8 +27,19 @@ class Priority(IntEnum):
     FIRST = 40000
 
 
+class Priorized:
+
+    @property
+    def priority(self) -> Priority:
+        return Priority.MIDDLE
+
+    @staticmethod
+    def sort(line: list["Priorized"], reverse=False) -> list["Priorized"]:
+        return sorted(line, key=lambda x: x.priority, reverse=reverse)
+
+
 # Not thread safe
-class Decorable(ABC, Iterable):
+class Decorable(Priorized, ABC, Iterable):
 
     _decorator: Any = None
     _last: Any = None
@@ -45,10 +56,6 @@ class Decorable(ABC, Iterable):
     @property
     def decorator(self) -> Any:
         return self._decorator
-
-    @property
-    @abstractmethod
-    def priority(self) -> int: ...
 
     def __init__(self, decorator: Union["Decorable", Any] = None) -> None:
         self._decorator = decorator
@@ -71,7 +78,7 @@ class Decorable(ABC, Iterable):
     def sort(decorable: "Decorable") -> "Decorable":
         line: list[Decorable] = list(decorable)[:-1]
         last = decorable.last
-        line.sort(key=lambda x: x.priority)
+        line = Priorized.sort(line, reverse=False)
         for next in line:
             next._decorator = last
             last = next
