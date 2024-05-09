@@ -149,9 +149,6 @@ class _RootIngredientProxy(IngredientProxy):
 
         return __ingredients[0]()
 
-
-class _OrderedIngredientProxy(_RootIngredientProxy):
-
     def __call__(self, formula: IngredientData) -> list[Ingredient]:
         _ingredients = super().__call__(formula)
 

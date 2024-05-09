@@ -7,7 +7,7 @@ from .pot import Pot
 from .ingredient import (
     _RootIngredient,
     Ingredient,
-    _OrderedIngredientProxy,
+    _RootIngredientProxy,
     IngredientProxy,
     IngredientData
 )
@@ -85,7 +85,7 @@ class Kitchen:
         if not (_t := getattr(_type, "type", None)):
             _t = _type
 
-        chef_line = _OrderedIngredientProxy(
+        chef_line = _RootIngredientProxy(
             _f=self.pot.get,
             formula=IngredientData(_type=_t, _id=_id))
 
