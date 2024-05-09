@@ -29,9 +29,15 @@ class Priority(IntEnum):
 
 class Priorized:
 
+    _priority: Priority = Priority.MIDDLE
+
     @property
     def priority(self) -> Priority:
-        return Priority.MIDDLE
+        return self._priority
+
+    @priority.setter
+    def priority(self, value: Priority) -> None:
+        self._priority = value
 
     @staticmethod
     def sort(line: list["Priorized"], reverse=False) -> list["Priorized"]:
@@ -93,4 +99,4 @@ class Decorable(Priorized, ABC, Iterable):
 
     @staticmethod
     def is_ordered(decorable: "Decorable") -> bool:
-        return Priorized.is_ordered(list(decorable)[::-1])
+        return Priorized.is_ordered(list(decorable)[:-1])
