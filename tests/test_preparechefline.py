@@ -26,7 +26,7 @@ def test_preparechefline_works():
 
     assert pypotage.cook(int).take_out() == 1
 
-    pypotage.kitchen_.chefLine.add(_TestChef())
+    pypotage.kitchen_.chef_line.add(_TestChef())
 
     @pypotage.prepare
     def bean_2():

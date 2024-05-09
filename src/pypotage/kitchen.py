@@ -57,11 +57,11 @@ class ChefLine:
 class Kitchen:
 
     pot: Pot
-    chefLine: ChefLine
+    chef_line: ChefLine
 
     def __init__(self, pot: Pot, chefs: list[Chef]) -> None:
         self.pot = pot
-        self.chefLine = ChefLine(self, chefs)
+        self.chef_line = ChefLine(self, chefs)
 
     def prepare(
             self,
@@ -74,7 +74,7 @@ class Kitchen:
             ingredient: Ingredient = Decorable.sort(_RootIngredient(_f))
 
             ingredient.formula._type = ingredient.type
-            prepared_ingredient = self.chefLine.prepare(ingredient)
+            prepared_ingredient = self.chef_line.prepare(ingredient)
 
             self.pot.add(prepared_ingredient)
 
@@ -89,4 +89,4 @@ class Kitchen:
             _f=self.pot.get,
             formula=IngredientData(_type=_t, _id=_id))
 
-        return Decorable.sort(self.chefLine.cook(chef_line))
+        return Decorable.sort(self.chef_line.cook(chef_line))
