@@ -81,7 +81,7 @@ def test_prepare_lazy_list():
 def test_list_chef_solo():
     kitchen_ = pypotage.Kitchen(
         pypotage.Pot(),
-        [pypotage.chefs.ListChef]
+        [pypotage.chefs.ListChef()]
     )
 
     @kitchen_.prepare

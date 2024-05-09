@@ -21,7 +21,7 @@ from . import chefsImpl as chefs
 
 kitchen_ = Kitchen(
     Pot(),
-    [chefs.ListChef, chefs.GenericChef]
+    [chefs.ListChef(), chefs.GenericChef()]
 )
 
 prepare = kitchen_.prepare

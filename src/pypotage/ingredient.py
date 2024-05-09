@@ -10,7 +10,7 @@ from inspect import isclass
 from math import inf
 from functools import cache
 
-from .utils import Decorable
+from .utils import Decorable, Priority
 
 
 _B = TypeVar("_B")
@@ -22,9 +22,18 @@ class IngredientData:
     _type: Any = None
     _id: str = None
     lazy: bool = False
-    order: int = 999999
     primary: bool = False
     extra: dict = field(default_factory=dict)
+
+    __order: int = inf
+
+    @property
+    def order(self) -> int:
+        return -inf if self.primary else self.__order
+
+    @order.setter
+    def order(self, value: int) -> None:
+        self.__order = value
 
 
 class Ingredient(Decorable):
@@ -33,35 +42,15 @@ class Ingredient(Decorable):
 
     @property
     def priority(self) -> int:
-        return 0
+        return Priority.MIDDLE
 
     @property
     def type(self) -> Any:
         if self.formula._type is not None:
             return self.formula._type
+
         if not self.decorator == self.last:
             return self.decorator.type
-        return None
-
-    def __init__(self, _c: Union["Ingredient", Callable]) -> None:
-        super().__init__(_c)
-        self.formula = _c.formula \
-            if isinstance(_c, Ingredient) \
-            else IngredientData()
-
-    @cache
-    def __call__(self) -> Any:
-        return self.decorator()
-
-
-class TypedIngredient(Ingredient):
-
-    @property
-    def type(self) -> Any:
-        _type = super().type
-
-        if _type is not None:
-            return _type
 
         _annotation = None if not hasattr(self.last, "__annotations__") else \
             self.last.__annotations__.get("return")
@@ -77,19 +66,29 @@ class TypedIngredient(Ingredient):
 
         return None
 
+    def __init__(self, _c: Union["Ingredient", Callable]) -> None:
+        super().__init__(_c)
+        self.formula = _c.formula \
+            if isinstance(_c, Ingredient) \
+            else IngredientData()
 
-class _RootIngredient(TypedIngredient):
+    @cache
+    def __call__(self) -> Any:
+        return self.decorator()
+
+
+class _RootIngredient(Ingredient):
 
     @property
     def priority(self) -> int:
-        return -inf
+        return inf
 
     @property
     def type(self) -> Any:
         return super().type or type(self())
 
 
-class LazyIngredient(TypedIngredient):
+class LazyIngredient(Ingredient):
 
     def __init__(self, _c: Callable) -> None:
         super().__init__(_c)
@@ -107,20 +106,24 @@ class LazyIngredient(TypedIngredient):
 
 class NoCallIngredient(LazyIngredient):
 
-    @property
-    def priority(self) -> int:
-        return 100
-
     def __call__(self) -> None:
         return self.decorator
 
 
-@dataclass(repr=False)
-class IngredientProxy(Generic[_B]):
-
-    _f: "IngredientProxy"
+class IngredientProxy(Decorable, Generic[_B]):
 
     formula: IngredientData
+
+    @property
+    def priority(self) -> int:
+        return Priority.MIDDLE
+
+    def __init__(
+            self,
+            _f: Union[Callable, "IngredientProxy"],
+            formula: IngredientData = None) -> None:
+        super().__init__(_f)
+        self.formula = formula
 
     def is_present(self) -> bool:
         return bool(self(self.formula))
@@ -128,15 +131,17 @@ class IngredientProxy(Generic[_B]):
     def take_out(self, __ingredients: list[Ingredient] = None) -> _B:
         if __ingredients is None:
             __ingredients = self(self.formula)
-        return self._f.take_out(__ingredients)
+        return self.decorator.take_out(__ingredients)
 
     def __call__(self, formula: IngredientData) -> list[Ingredient]:
-        return self._f(formula)
+        return self.decorator(formula)
 
 
 class _RootIngredientProxy(IngredientProxy):
 
-    _f: Callable
+    @property
+    def priority(self) -> int:
+        return -inf
 
     def take_out(self, __ingredients: list[Ingredient] = None) -> Any:
         if __ingredients == []:
@@ -144,15 +149,12 @@ class _RootIngredientProxy(IngredientProxy):
 
         return __ingredients[0]()
 
-
-class _OrderedIngredientProxy(_RootIngredientProxy):
-
     def __call__(self, formula: IngredientData) -> list[Ingredient]:
         _ingredients = super().__call__(formula)
 
         _ingredients = sorted(
             _ingredients,
-            key=lambda x: -inf if x.formula.primary else x.formula.order
+            key=lambda x: x.formula.order
         )
 
         return _ingredients

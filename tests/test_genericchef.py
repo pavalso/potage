@@ -103,7 +103,7 @@ def test_multiple_generic_class():
 def test_generic_chef_solo():
     kitchen_ = pypotage.Kitchen(
         pypotage.Pot(),
-        [pypotage.chefs.GenericChef]
+        [pypotage.chefs.GenericChef()]
     )
 
     @kitchen_.prepare

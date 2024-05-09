@@ -1,5 +1,5 @@
 from typing import TypeVar, Callable, Union
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
 from warnings import warn
 
@@ -7,10 +7,11 @@ from .pot import Pot
 from .ingredient import (
     _RootIngredient,
     Ingredient,
-    _OrderedIngredientProxy,
+    _RootIngredientProxy,
     IngredientProxy,
     IngredientData
 )
+from .utils import Decorable, Priorized
 
 
 _B = TypeVar("_B")
@@ -18,17 +19,15 @@ _IPT = TypeVar("_IPT")
 
 
 @dataclass
-class Chef(ABC):
+class Chef(Priorized, ABC):
 
-    kitchen: "Kitchen"
-
-    @abstractmethod
     def prepare(self,
-                ingredient: Ingredient) -> Ingredient: ...
+                ingredient: Ingredient) -> Ingredient:
+        return ingredient
 
-    @abstractmethod
     def cook(self,
-             line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]: ...
+             line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]:
+        return line
 
 
 @dataclass
@@ -38,10 +37,11 @@ class ChefLine:
     chefs: list[Chef]
 
     def __post_init__(self) -> None:
-        self.chefs = [chef(self.kitchen) for chef in self.chefs]
+        self.chefs = Priorized.sort(self.chefs)
 
     def add(self, chef: Chef) -> None:
-        self.chefs.append(chef(self.kitchen))
+        self.chefs.append(chef)
+        self.chefs = Priorized.sort(self.chefs)
 
     def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
         for _chef in self.chefs:
@@ -57,11 +57,11 @@ class ChefLine:
 class Kitchen:
 
     pot: Pot
-    chefLine: ChefLine
+    chef_line: ChefLine
 
-    def __init__(self, pot: Pot, chefs: list[type[Chef]]) -> None:
+    def __init__(self, pot: Pot, chefs: list[Chef]) -> None:
         self.pot = pot
-        self.chefLine = ChefLine(self, chefs)
+        self.chef_line = ChefLine(self, chefs)
 
     def prepare(
             self,
@@ -71,23 +71,10 @@ class Kitchen:
             if kwargs:
                 warn("kwargs are not supported in the prepare decorator")
 
-            ingredient = _RootIngredient(_f)
-
-            line = [
-                ingredient
-                for ingredient
-                in ingredient
-                if type(ingredient) is not Ingredient][:-1]
-            _f = line[-1].decorator
-            line.sort(key=lambda x: x.priority)
-            last = line[-1]
-            last._decorator = _f
-            for next in line[:-1][::-1]:
-                next._decorator = last
-                last = next
+            ingredient: Ingredient = Decorable.sort(_RootIngredient(_f))
 
             ingredient.formula._type = ingredient.type
-            prepared_ingredient = self.chefLine.prepare(ingredient)
+            prepared_ingredient = self.chef_line.prepare(ingredient)
 
             self.pot.add(prepared_ingredient)
 
@@ -98,8 +85,8 @@ class Kitchen:
         if not (_t := getattr(_type, "type", None)):
             _t = _type
 
-        chef_line = _OrderedIngredientProxy(
+        chef_line = _RootIngredientProxy(
             _f=self.pot.get,
             formula=IngredientData(_type=_t, _id=_id))
 
-        return self.chefLine.cook(chef_line)
+        return Decorable.sort(self.chef_line.cook(chef_line))

@@ -3,7 +3,8 @@ from typing import (
     Iterable,
     Iterator,
     Union)
-from abc import ABC, abstractmethod
+from abc import ABC
+from enum import IntEnum
 
 
 def traverse_subclasses(cls) -> list:
@@ -18,8 +19,40 @@ def traverse_subclasses(cls) -> list:
     return subclasses
 
 
+class Priority(IntEnum):
+    LAST = 0
+    BEFORE_LAST = 10000
+    MIDDLE = 20000
+    AFTER_FIRST = 30000
+    FIRST = 40000
+
+
+class Priorized:
+
+    _priority: Priority = Priority.MIDDLE
+
+    @property
+    def priority(self) -> Priority:
+        return self._priority
+
+    @priority.setter
+    def priority(self, value: Priority) -> None:
+        self._priority = value
+
+    @staticmethod
+    def sort(line: list["Priorized"], reverse=False) -> list["Priorized"]:
+        return sorted(line, key=lambda x: x.priority, reverse=not reverse)
+
+    @staticmethod
+    def is_ordered(line: list["Priorized"]) -> bool:
+        return all(
+            line[i].priority >= line[i + 1].priority
+            for i in range(len(line) - 1)
+        )
+
+
 # Not thread safe
-class Decorable(ABC, Iterable):
+class Decorable(Priorized, ABC, Iterable):
 
     _decorator: Any = None
     _last: Any = None
@@ -37,10 +70,6 @@ class Decorable(ABC, Iterable):
     def decorator(self) -> Any:
         return self._decorator
 
-    @property
-    @abstractmethod
-    def priority(self) -> int: ...
-
     def __init__(self, decorator: Union["Decorable", Any] = None) -> None:
         self._decorator = decorator
 
@@ -57,3 +86,17 @@ class Decorable(ABC, Iterable):
         if _r is not None:
             return _r
         raise StopIteration
+
+    @staticmethod
+    def sort(decorable: "Decorable") -> "Decorable":
+        line: list[Decorable] = list(decorable)[:-1]
+        last = decorable.last
+        line = Priorized.sort(line, reverse=True)
+        for next in line:
+            next._decorator = last
+            last = next
+        return line[-1]
+
+    @staticmethod
+    def is_ordered(decorable: "Decorable") -> bool:
+        return Priorized.is_ordered(list(decorable)[:-1])
