@@ -1,5 +1,5 @@
 from ..kitchen import Chef
-from ..ingredient import IngredientProxy, _B, Ingredient
+from ..ingredient import IngredientProxy, Ingredient
 from ..utils import Priority
 
 
@@ -9,7 +9,7 @@ class _ListIngredientProxy(IngredientProxy):
     def priority(self) -> int:
         return Priority.FIRST
 
-    def take_out(self, __ingredients: list[Ingredient] = None) -> list[_B]:
+    def take_out(self, __ingredients: list[Ingredient] = None) -> list:
         if __ingredients is None:
             __ingredients = self(self.formula)
 
@@ -25,7 +25,7 @@ class ListChef(Chef):
     def prepare(self, ingredient: Ingredient) -> Ingredient:
         return ingredient
 
-    def cook(self, line: IngredientProxy) -> IngredientProxy[_B]:
+    def cook(self, line: IngredientProxy) -> IngredientProxy:
         if not getattr(line.formula._type, "__origin__", None) == list:
             return line
         line.formula._type = line.formula._type.__args__[0]
