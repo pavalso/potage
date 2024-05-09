@@ -35,7 +35,14 @@ class Priorized:
 
     @staticmethod
     def sort(line: list["Priorized"], reverse=False) -> list["Priorized"]:
-        return sorted(line, key=lambda x: x.priority, reverse=reverse)
+        return sorted(line, key=lambda x: x.priority, reverse=not reverse)
+
+    @staticmethod
+    def is_ordered(line: list["Priorized"]) -> bool:
+        return all(
+            line[i].priority >= line[i + 1].priority
+            for i in range(len(line) - 1)
+        )
 
 
 # Not thread safe
@@ -78,8 +85,12 @@ class Decorable(Priorized, ABC, Iterable):
     def sort(decorable: "Decorable") -> "Decorable":
         line: list[Decorable] = list(decorable)[:-1]
         last = decorable.last
-        line = Priorized.sort(line, reverse=False)
+        line = Priorized.sort(line, reverse=True)
         for next in line:
             next._decorator = last
             last = next
         return line[-1]
+
+    @staticmethod
+    def is_ordered(decorable: "Decorable") -> bool:
+        return Priorized.is_ordered(list(decorable)[::-1])

@@ -37,11 +37,11 @@ class ChefLine:
     chefs: list[Chef]
 
     def __post_init__(self) -> None:
-        self.chefs = Priorized.sort(self.chefs, reverse=True)
+        self.chefs = Priorized.sort(self.chefs)
 
     def add(self, chef: Chef) -> None:
         self.chefs.append(chef)
-        self.chefs = Priorized.sort(self.chefs, reverse=True)
+        self.chefs = Priorized.sort(self.chefs)
 
     def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
         for _chef in self.chefs:
