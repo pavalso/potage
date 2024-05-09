@@ -1,5 +1,5 @@
 from typing import TypeVar, Callable, Union
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
 from warnings import warn
 
@@ -21,13 +21,13 @@ _IPT = TypeVar("_IPT")
 @dataclass
 class Chef(Priorized, ABC):
 
-    @abstractmethod
     def prepare(self,
-                ingredient: Ingredient) -> Ingredient: ...
+                ingredient: Ingredient) -> Ingredient:
+        return ingredient
 
-    @abstractmethod
     def cook(self,
-             line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]: ...
+             line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]:
+        return line
 
 
 @dataclass
