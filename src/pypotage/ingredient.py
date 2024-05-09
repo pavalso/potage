@@ -48,29 +48,9 @@ class Ingredient(Decorable):
     def type(self) -> Any:
         if self.formula._type is not None:
             return self.formula._type
+
         if not self.decorator == self.last:
             return self.decorator.type
-        return None
-
-    def __init__(self, _c: Union["Ingredient", Callable]) -> None:
-        super().__init__(_c)
-        self.formula = _c.formula \
-            if isinstance(_c, Ingredient) \
-            else IngredientData()
-
-    @cache
-    def __call__(self) -> Any:
-        return self.decorator()
-
-
-class TypedIngredient(Ingredient):
-
-    @property
-    def type(self) -> Any:
-        _type = super().type
-
-        if _type is not None:
-            return _type
 
         _annotation = None if not hasattr(self.last, "__annotations__") else \
             self.last.__annotations__.get("return")
@@ -86,8 +66,18 @@ class TypedIngredient(Ingredient):
 
         return None
 
+    def __init__(self, _c: Union["Ingredient", Callable]) -> None:
+        super().__init__(_c)
+        self.formula = _c.formula \
+            if isinstance(_c, Ingredient) \
+            else IngredientData()
 
-class _RootIngredient(TypedIngredient):
+    @cache
+    def __call__(self) -> Any:
+        return self.decorator()
+
+
+class _RootIngredient(Ingredient):
 
     @property
     def priority(self) -> int:
@@ -98,7 +88,7 @@ class _RootIngredient(TypedIngredient):
         return super().type or type(self())
 
 
-class LazyIngredient(TypedIngredient):
+class LazyIngredient(Ingredient):
 
     def __init__(self, _c: Callable) -> None:
         super().__init__(_c)
