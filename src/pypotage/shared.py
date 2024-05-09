@@ -3,7 +3,7 @@ __proyect__ = "pypotage"
 __author__ = "Pavalso"
 __url__ = "https://github.com/pavalso/potage"
 
-__version__ = "v0.1.2-alpha"
-__description__ = """Beans is a simple and lightweight Python library
-created to allow an easy Dependency Injection handling in Python projects."""
+__version__ = "v0.2.0-alpha"
+__description__ = """Pypotage is a simple Python package that provides an 
+easy way to use Dependency Injection in your projects."""
 __license__ = "MIT"
