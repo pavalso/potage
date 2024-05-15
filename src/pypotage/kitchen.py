@@ -1,7 +1,12 @@
-from typing import TypeVar, Callable, Union, Type, Generic
 from abc import ABC
 from dataclasses import dataclass
 from warnings import warn
+from typing import (
+    TypeVar,
+    Callable,
+    Union,
+    Type,
+    Generic)
 
 from .pot import Pot
 from .ingredient import (
@@ -77,7 +82,7 @@ class Kitchen:
     def __init__(
             self,
             pot: Pot,
-            chefs: Union[ChefLine | list[Type[Chef]]]) -> None:
+            chefs: Union[ChefLine, list[Type[Chef]]]) -> None:
         self.pot = pot
         self.chef_line = chefs \
             if isinstance(chefs, ChefLine) \
@@ -85,7 +90,7 @@ class Kitchen:
 
     def prepare(
             self,
-            _f: Union[Callable, Type] | _B = None,
+            _f: Union[Callable, Decorable] = None,
             /, **kwargs) -> _B:
         def _wrapper(_f: _B) -> Ingredient:
             if kwargs:
@@ -104,7 +109,7 @@ class Kitchen:
     def cook(
             self,
             _type: _B,
-            _id: str = None) -> PackedMeal[_B]:
+            _id: str = None) -> Union[PackedMeal[_B], _B]:
         if not (_t := getattr(_type, "type", None)):
             _t = _type
 
