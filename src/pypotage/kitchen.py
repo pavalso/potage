@@ -1,4 +1,4 @@
-from typing import TypeVar, Callable, Union
+from typing import TypeVar, Callable, Union, Type, Generic
 from abc import ABC
 from dataclasses import dataclass
 from warnings import warn
@@ -18,6 +18,19 @@ _B = TypeVar("_B")
 _IPT = TypeVar("_IPT")
 
 
+class PackedMeal(property, Generic[_IPT]):
+
+    def __init__(self, ingredient: IngredientProxy, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.ingredient = ingredient
+
+    def is_present(self) -> bool:
+        return self.ingredient.is_present()
+
+    def take_out(self) -> _IPT:
+        return self.ingredient.take_out()
+
+
 @dataclass
 class Chef(Priorized, ABC):
 
@@ -26,15 +39,14 @@ class Chef(Priorized, ABC):
         return ingredient
 
     def cook(self,
-             line: IngredientProxy[_IPT]) -> IngredientProxy[_IPT]:
+             line: IngredientProxy) -> IngredientProxy:
         return line
 
 
 @dataclass
 class ChefLine:
 
-    kitchen: "Kitchen"
-    chefs: list[Chef]
+    chefs: list[Type[Chef]]
 
     def __post_init__(self) -> None:
         self.chefs = Priorized.sort(self.chefs)
@@ -43,7 +55,7 @@ class ChefLine:
         self.chefs.append(chef)
         self.chefs = Priorized.sort(self.chefs)
 
-    def cook(self, line: IngredientProxy[_B]) -> IngredientProxy[_B]:
+    def cook(self, line: IngredientProxy) -> IngredientProxy:
         for _chef in self.chefs:
             line = _chef.cook(line)
         return line
@@ -53,21 +65,29 @@ class ChefLine:
             ingredient = _chef.prepare(ingredient)
         return ingredient
 
+    def pack(self, ingredient: IngredientProxy) -> PackedMeal:
+        return PackedMeal(ingredient, lambda _: ingredient.take_out())
+
 
 class Kitchen:
 
     pot: Pot
     chef_line: ChefLine
 
-    def __init__(self, pot: Pot, chefs: list[Chef]) -> None:
+    def __init__(
+            self,
+            pot: Pot,
+            chefs: Union[ChefLine | list[Type[Chef]]]) -> None:
         self.pot = pot
-        self.chef_line = ChefLine(self, chefs)
+        self.chef_line = chefs \
+            if isinstance(chefs, ChefLine) \
+            else ChefLine(chefs)
 
     def prepare(
             self,
-            _f: Union[Callable, Ingredient] = None,
-            /, **kwargs) -> Callable:
-        def _wrapper(_f: Union[Callable, Ingredient]) -> Ingredient:
+            _f: Union[Callable, Type] | _B = None,
+            /, **kwargs) -> _B:
+        def _wrapper(_f: _B) -> Ingredient:
             if kwargs:
                 warn("kwargs are not supported in the prepare decorator")
 
@@ -81,7 +101,10 @@ class Kitchen:
             return ingredient.last
         return _wrapper(_f) if _f is not None else _wrapper
 
-    def cook(self, _type: _B, _id: str = None) -> IngredientProxy[_B]:
+    def cook(
+            self,
+            _type: _B,
+            _id: str = None) -> PackedMeal[_B]:
         if not (_t := getattr(_type, "type", None)):
             _t = _type
 
@@ -89,4 +112,6 @@ class Kitchen:
             _f=self.pot.get,
             formula=IngredientData(_type=_t, _id=_id))
 
-        return Decorable.sort(self.chef_line.cook(chef_line))
+        last = Decorable.sort(self.chef_line.cook(chef_line))
+
+        return self.chef_line.pack(last)

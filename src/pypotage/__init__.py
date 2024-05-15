@@ -16,12 +16,12 @@ from .decorators import (
     ingredient
 )
 
-from . import chefsImpl as chefs
+from . import defaultChefs as chefs
 
 
 kitchen_ = Kitchen(
     Pot(),
-    [chefs.ListChef(), chefs.GenericChef()]
+    ChefLine([chefs.ListChef(), chefs.GenericChef()])
 )
 
 prepare = kitchen_.prepare
