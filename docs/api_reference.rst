@@ -9,10 +9,6 @@ Ingredients
     :undoc-members:
     :show-inheritance:
 
-.. autoclass:: pypotage.ingredient.TypedIngredient
-    :members:
-    :show-inheritance:
-
 .. autoclass:: pypotage.ingredient._RootIngredient
     :members:
     :show-inheritance:
@@ -38,10 +34,6 @@ Ingredient Proxies
     :members:
     :show-inheritance:
 
-.. autoclass:: pypotage.ingredient._OrderedIngredientProxy
-    :members:
-    :show-inheritance:
-
 
 Ingredient Data
 ======================
@@ -60,15 +52,30 @@ Chefs
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: pypotage.chefs
+.. automodule:: pypotage.defaultChefs
     :members:
-    :show-inheritance:
 
 
 Kitchen
 =======
 
 .. autoclass:: pypotage.Kitchen
+    :members:
+    :undoc-members:
+
+
+Chef Line
+=========
+
+.. autoclass:: pypotage.ChefLine
+    :members:
+    :undoc-members:
+
+
+Packed Meal
+===========
+
+.. autoclass:: pypotage.PackedMeal
     :members:
     :undoc-members:
     :show-inheritance:
@@ -80,7 +87,6 @@ Pot
 .. autoclass:: pypotage.Pot
     :members:
     :undoc-members:
-    :show-inheritance:
 
 
 Utils
@@ -89,4 +95,3 @@ Utils
 .. automodule:: pypotage.utils
     :members:
     :undoc-members:
-    :show-inheritance:

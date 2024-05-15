@@ -21,7 +21,7 @@ injection
 
 To install the latest **pypotage** version, run the following command:
 ````bash
-python3 -m pip install -U pypotage
+python -m pip install -U pypotage
 ````
 
 #### Development
@@ -30,7 +30,7 @@ To install the development version:
 ````bash
 git clone https://github.com/pavalso/potage.git
 cd potage
-python3 -m pip install -U .
+python -m pip install -U .
 ````
 
 ## Quick Examples
