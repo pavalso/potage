@@ -4,6 +4,7 @@ from .pot import Pot
 from .kitchen import (  # noqa: F401
     Kitchen,
     ChefLine,
+    PackedMeal,
     Chef
 )
 from .decorators import (
@@ -16,12 +17,12 @@ from .decorators import (
     ingredient
 )
 
-from . import chefsImpl as chefs
+from . import defaultChefs as chefs
 
 
 kitchen_ = Kitchen(
     Pot(),
-    [chefs.ListChef(), chefs.GenericChef()]
+    ChefLine([chefs.ListChef(), chefs.GenericChef()])
 )
 
 prepare = kitchen_.prepare
@@ -33,7 +34,8 @@ __all__ = [
     "ingredients",
     "Pot",
     "Kitchen",
-    "Chef"
+    "Chef",
+    "PackedMeal",
     "ChefLine",
     "chefs",
     "lazy",

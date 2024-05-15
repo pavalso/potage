@@ -8,7 +8,7 @@ Pypotage installation is pretty straightforward. You can install the latest rele
 
 .. code-block:: bash
 
-   python3 -m pip install -U pypotage
+   python -m pip install -U pypotage
 
 After the installation, you can start using the package by importing it in your Python code:
 
@@ -29,4 +29,26 @@ you can install the latest development version from the GitHub repository:
 
    git clone https://github.com/pavalso/potage.git
    cd potage
-   python3 -m pip install -U .
+   python -m pip install -U .
+
+
+Tests
+====================
+
+Tests are written using the `pytest` framework. First you will need to install the required dependencies to use it:
+
+.. code-block:: bash
+
+   python -m pip install -r ./tests/requirements.txt
+
+After that, you can run the tests using the following command:
+
+.. code-block:: bash
+
+   python -m pytest tests/
+
+In case you want to get the coverage report, you can use the following command:
+
+.. code-block:: bash
+
+   python -m pytest --cov=src/ tests/

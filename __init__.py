@@ -1,38 +1,46 @@
 from src import pypotage
 
+import logging
+
 
 if __name__ == "__main__":
-    class Parent1:
-        def __init__(self):
-            print("Parent1.__init__")
+    class Proof:
 
-        def test1(self):
-            print("Parent1.test")
+        logger = pypotage.cook(logging.Logger)
 
-    class Parent2:
-        def __init__(self):
-            print("Parent2.__init__")
+        def test(self):
+            print(self.logger)
+            self.logger.info("Hello, World!")
 
-        def test2(self):
-            print("Parent2.test")
+    proof = Proof()
 
     @pypotage.prepare
-    class Child(Parent1, Parent2):
-        def __init__(self):
-            super().__init__()
-            print("Child.__init__")
+    @pypotage.primary
+    def prepare():
+        print("Hello, World!")
+        logger = logging.getLogger("Proof")
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        return logger
 
-    print(pypotage.cook(Parent1).take_out())
-    print(pypotage.cook(Parent2).take_out())
-    print(pypotage.cook(Child).take_out())
+    @pypotage.prepare
+    @pypotage.lazy
+    def prepare2() -> logging.Logger:
+        print("Hello, World 2!")
+        logger = logging.getLogger("Test")
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        return logger
 
-    @pypotage.prepare(primary=True)
-    class GrandChild(Child):
-        def __init__(self):
-            super().__init__()
-            print("GrandChild.__init__")
+    proof.test()
+    proof.test()
 
-    print(pypotage.cook(Parent1).take_out())
-    print(pypotage.cook(Parent2).take_out())
-    print(pypotage.cook(Child).take_out())
-    print(pypotage.cook(GrandChild).take_out())
+    print(pypotage.cook(str).is_present())
