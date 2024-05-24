@@ -5,12 +5,12 @@ from src import pypotage
 
 class _TestChef(pypotage.Chef):
     def prepare(self, ingredient):
-        ingredient.formula._id = "test"
-        ingredient.formula._type = str
+        ingredient.formula.id = "test"
+        ingredient.formula.type = str
         return ingredient
 
     def cook(self, line):
-        line.formula._type = str
+        line.formula.type = str
         return line
 
 
@@ -32,4 +32,4 @@ def test_preparechefline_works():
     def bean_2():
         return 1
 
-    assert pypotage.cook(int, "test").take_out() == 1
+    assert pypotage.cook(str, "test").take_out() == 1

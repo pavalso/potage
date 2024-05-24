@@ -42,8 +42,9 @@ def test_2depth_multiple_inheritance():
     class Child(Parent1, Parent2):
         pass
 
-    @pypotage.prepare
-    @pypotage.primary
+    @pypotage.prepare(
+        pypotage.primary
+    )
     class GrandChild(Child):
         pass
 
@@ -96,13 +97,15 @@ def test_generic_multiple_inheritance_list():
         def test2(self):
             return "Parent2.test"
 
-    @pypotage.prepare
-    @pypotage.no_call
+    @pypotage.prepare(
+        pypotage.no_call
+    )
     class Child(Parent1, Parent2):
         pass
 
-    @pypotage.prepare
-    @pypotage.no_call
+    @pypotage.prepare(
+        pypotage.no_call
+    )
     class SpecificChild(Parent1[int], Parent2[str]):
         pass
 
@@ -114,8 +117,9 @@ def test_generic_multiple_inheritance_list():
     assert Child in pypotage.cook(list[Parent1]).take_out()
     assert Child not in pypotage.cook(list[Parent1[int]]).take_out()
 
-    @pypotage.prepare
-    @pypotage.no_call
+    @pypotage.prepare(
+        pypotage.no_call
+    )
     class ChildOfSpecificChild(SpecificChild):
         pass
 

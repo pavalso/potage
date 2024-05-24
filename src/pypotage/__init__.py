@@ -1,28 +1,35 @@
 from . import ingredient as ingredients
+from . import utils
 
+from .utils import Priority
+
+from . import flavours
+
+from . import defaultChefs as chefs
+
+from .ingredient import (
+    Ingredient,
+    Flavour,
+    IngredientProxy,
+    IngredientData
+)
 from .pot import Pot
 from .kitchen import (  # noqa: F401
     Kitchen,
     ChefLine,
-    PackedMeal,
     Chef
 )
-from .decorators import (
-    lazy,
-    no_call,
-    id,
-    order,
-    primary,
-    type,
-    ingredient
-)
 
-from . import defaultChefs as chefs
-
+lazy = flavours.LazyFlavour
+no_call = flavours.NoCallFlavour
+order = flavours.OrderFlavour
+primary = flavours.PrimaryFlavour
+id = flavours.IdFlavour
+type = flavours.TypeFlavour
 
 kitchen_ = Kitchen(
-    Pot(),
-    ChefLine([chefs.ListChef(), chefs.GenericChef()])
+    pot=Pot(),
+    chefs=ChefLine([chefs.ListChef(), chefs.GenericChef()])
 )
 
 prepare = kitchen_.prepare
@@ -35,7 +42,6 @@ __all__ = [
     "Pot",
     "Kitchen",
     "Chef",
-    "PackedMeal",
     "ChefLine",
     "chefs",
     "lazy",
@@ -44,5 +50,11 @@ __all__ = [
     "order",
     "primary",
     "type",
-    "ingredient"
+    "Ingredient",
+    "utils",
+    "Flavour",
+    "IngredientProxy",
+    "Priority",
+    "IngredientData",
+    "flavours"
 ]

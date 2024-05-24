@@ -3,23 +3,17 @@ from src.pypotage import utils
 
 class Priorized1(utils.Priorized):
 
-    @property
-    def priority(self) -> int:
-        return utils.Priority.LAST
+    priority = utils.Priority.LAST
 
 
 class Priorized2(utils.Priorized):
 
-    @property
-    def priority(self) -> int:
-        return utils.Priority.MIDDLE
+    priority = utils.Priority.MIDDLE
 
 
 class Priorized3(utils.Priorized):
 
-    @property
-    def priority(self) -> int:
-        return utils.Priority.FIRST
+    priority = utils.Priority.FIRST
 
 
 def test_does_order():
@@ -44,3 +38,21 @@ def test_is_ordered():
     assert utils.Priorized.is_ordered(
         [Priorized1(), Priorized2(), Priorized3()]
     ) is False
+
+
+def test_after_and_before_methods():
+    class AfterPriorized1(utils.Priorized):
+
+        priority = utils.Priorized.after(Priorized1)
+
+    assert utils.Priorized.is_ordered(
+        [Priorized1(), AfterPriorized1()]
+    )
+
+    class BeforePriorized1(utils.Priorized):
+
+        priority = utils.Priorized.before(Priorized1)
+
+    assert utils.Priorized.is_ordered(
+        [BeforePriorized1(), Priorized1()]
+    )

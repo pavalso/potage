@@ -1,22 +1,26 @@
 from abc import ABC
 from dataclasses import dataclass
-from warnings import warn
 from typing import (
+    Generic,
     TypeVar,
-    Callable,
     Union,
     Type,
-    Generic)
+    Callable
+)
 
 from .pot import Pot
 from .ingredient import (
-    _RootIngredient,
+    Flavour,
     Ingredient,
-    _RootIngredientProxy,
     IngredientProxy,
     IngredientData
 )
-from .utils import Decorable, Priorized
+from .ingredientProxies import _RootIngredientProxy
+from .flavours import (
+    ForcedTypeFlavour,
+    StaticTypeCheckerFlavour
+)
+from .utils import Priorized
 
 
 _B = TypeVar("_B")
@@ -53,7 +57,8 @@ class ChefLine:
 
     chefs: list[Type[Chef]]
 
-    def __post_init__(self) -> None:
+    def __init__(self, chefs: list[Type[Chef]] = None) -> None:
+        self.chefs = chefs or []
         self.chefs = Priorized.sort(self.chefs)
 
     def add(self, chef: Chef) -> None:
@@ -81,42 +86,71 @@ class Kitchen:
 
     def __init__(
             self,
-            pot: Pot,
-            chefs: Union[ChefLine, list[Type[Chef]]]) -> None:
-        self.pot = pot
+            pot: Pot = None,
+            chefs: Union[ChefLine, list[Type[Chef]]] = None) -> None:
+        self.pot = pot or Pot()
         self.chef_line = chefs \
             if isinstance(chefs, ChefLine) \
             else ChefLine(chefs)
 
     def prepare(
             self,
-            _f: Union[Callable, Decorable] = None,
-            /, **kwargs) -> _B:
-        def _wrapper(_f: _B) -> Ingredient:
-            if kwargs:
-                warn("kwargs are not supported in the prepare decorator")
+            _f: Callable = None,
+            *flavours: list[Flavour]) -> Callable:
+        def _wrapper(_f: Callable) -> Callable:
+            ingredient = Ingredient(
+                formula=IngredientData(),
+                decorates=_f
+            )
 
-            ingredient: Ingredient = Decorable.sort(_RootIngredient(_f))
+            ordered_flavours = Priorized.sort([
+                ForcedTypeFlavour,
+                StaticTypeCheckerFlavour,
+                *flavours])
 
-            ingredient.formula._type = ingredient.type
-            prepared_ingredient = self.chef_line.prepare(ingredient)
+            for flavour in ordered_flavours:
+                ingredient = ingredient.apply(flavour)
 
-            self.pot.add(prepared_ingredient)
+            ingredient = Ingredient.sort(ingredient)[0]
+
+            self.chef_line.prepare(
+                ingredient=ingredient
+                )
+
+            self.pot.add(ingredient)
 
             return ingredient.last
-        return _wrapper(_f) if _f is not None else _wrapper
+
+        called_decorator = _f is None  # @pypotage.prepare()
+
+        if called_decorator:
+            return _wrapper
+
+        flavoured = isinstance(_f, Flavour) or \
+            isinstance(_f, type) and issubclass(_f, Flavour)
+
+        if flavoured:
+            flavours = [_f, *flavours]
+            return _wrapper
+
+        return _wrapper(_f)
 
     def cook(
             self,
-            _type: _B,
-            _id: str = None) -> Union[PackedMeal[_B], _B]:
-        if not (_t := getattr(_type, "type", None)):
-            _t = _type
+            type: _B,
+            id: str = None,
+            proxies: list[IngredientProxy] = None
+            ) -> Union[_IPT, PackedMeal[_IPT]]:
+        if not (_t := getattr(type, "type", None)):
+            _t = type
 
-        chef_line = _RootIngredientProxy(
-            _f=self.pot.get,
-            formula=IngredientData(_type=_t, _id=_id))
+        order = _RootIngredientProxy(
+            formula=IngredientData(type=_t, id=id),
+            decorates=self.pot.get)
 
-        last = Decorable.sort(self.chef_line.cook(chef_line))
+        cooked_order = self.chef_line.cook(order)
+        cooked_order = IngredientProxy.from_list(cooked_order, proxies)
 
-        return self.chef_line.pack(last)
+        ordered_proxies = IngredientProxy.sort(cooked_order)
+
+        return self.chef_line.pack(ordered_proxies[0])
