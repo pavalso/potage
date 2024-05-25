@@ -39,7 +39,7 @@ class PackedMeal(property, Generic[_B]):
     def is_present(self) -> bool:
         return self.ingredient.is_present()
 
-    def take_out(self) -> Any:
+    def take_out(self) -> _B:
         return self.ingredient.take_out()
 
     @overload
