@@ -1,12 +1,16 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import (
+    Any,
     Generic,
     TypeVar,
     Union,
     Type,
-    Callable
+    Callable,
+    overload
 )
+
+from typing_extensions import Self
 
 from .pot import Pot
 from .ingredient import (
@@ -24,10 +28,9 @@ from .utils import Priorized
 
 
 _B = TypeVar("_B")
-_IPT = TypeVar("_IPT")
 
 
-class PackedMeal(property, Generic[_IPT]):
+class PackedMeal(property, Generic[_B]):
 
     def __init__(self, ingredient: IngredientProxy, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -36,8 +39,26 @@ class PackedMeal(property, Generic[_IPT]):
     def is_present(self) -> bool:
         return self.ingredient.is_present()
 
-    def take_out(self) -> _IPT:
+    def take_out(self) -> Any:
         return self.ingredient.take_out()
+
+    @overload
+    def __get__(
+        self,
+        instance: None,
+        owner: Union[type, None] = None) -> Self: ...
+
+    @overload
+    def __get__(
+        self,
+        instance: Any,
+        owner: Union[type, None] = None) -> _B: ...
+
+    def __get__(
+            self,
+            instance: Any,
+            owner: Union[type, None] = None) -> Union[_B, Self]:
+        return super().__get__(instance, owner)
 
 
 @dataclass
@@ -119,7 +140,7 @@ class Kitchen:
 
             self.pot.add(ingredient)
 
-            return ingredient.last
+            return _f
 
         called_decorator = _f is None  # @pypotage.prepare()
 
@@ -140,7 +161,7 @@ class Kitchen:
             type: _B,
             id: str = None,
             proxies: list[IngredientProxy] = None
-            ) -> Union[_IPT, PackedMeal[_IPT]]:
+            ) -> PackedMeal[_B]:
         if not (_t := getattr(type, "type", None)):
             _t = type
 
