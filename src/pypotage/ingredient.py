@@ -23,7 +23,7 @@ class IngredientData:
     primary: bool = False
     extra: dict = field(default_factory=dict)
 
-    __order: int = inf
+    __order: int = Priority.MIDDLE
 
     @property
     def order(self) -> int:

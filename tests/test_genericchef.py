@@ -29,11 +29,23 @@ def test_generic_chef():
 def test_generic_subclasses():
     class TestGenericSubclass(TestGeneric[T]):
         ...
-
+    
+    pytest.raises(RuntimeError, pypotage.cook(TestGeneric[int]).take_out)
+    
     pypotage.prepare(TestGenericSubclass[int])
+
     assert isinstance(
         pypotage.cook(TestGeneric[int]).take_out(), TestGenericSubclass)
+    assert isinstance(
+        pypotage.cook(TestGenericSubclass[int]).take_out(), TestGenericSubclass)
+
     pytest.raises(RuntimeError, pypotage.cook(TestGeneric).take_out)
+    pytest.raises(RuntimeError, pypotage.cook(TestGeneric[str]).take_out)
+
+    pypotage.prepare(TestGenericSubclass[str])
+    
+    assert isinstance(
+        pypotage.cook(TestGeneric[str]).take_out(), TestGenericSubclass)
 
 
 def test_non_generic_subclasses():

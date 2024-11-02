@@ -50,11 +50,11 @@ if __name__ == "__main__":
 
         logger = pypotage.cook(logging.Logger)
 
-        def do_uwu(self):
-            self.logger.info("UwU")
+        def do_test(self):
+            self.logger.info("Test")
 
     x = TestClass()
-    x.do_uwu()
+    x.do_test()
 
     @pypotage.prepare(
         pypotage.lazy,
@@ -71,4 +71,10 @@ if __name__ == "__main__":
         logger.addHandler(handler)
         return logger
 
-    x.do_uwu()
+    x.do_test()
+    
+    @pypotage.prepare
+    def test():
+        return 1
+    
+    print(pypotage.cook(int).take_out())

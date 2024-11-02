@@ -1,5 +1,6 @@
 from typing import Any
 from math import inf
+from inspect import isclass
 
 from .utils import (
     Priority,
@@ -12,7 +13,7 @@ from .ingredient import (
 
 class ForcedTypeFlavour(Flavour):
 
-    priority: Priority = -inf
+    priority: Priority = Priority.LAST
 
     @staticmethod
     def apply_to(ingredient: Ingredient) -> Ingredient:
@@ -20,25 +21,32 @@ class ForcedTypeFlavour(Flavour):
             return ingredient
 
         ingr_return = ingredient()
-        ingredient.formula.type = type(ingr_return)
+        
+        if hasattr(ingr_return, "__orig_class__"):
+            ingredient.formula.type = ingr_return.__orig_class__
+        else:
+            ingredient.formula.type = type(ingr_return)
 
         return ingredient
 
 
 class StaticTypeCheckerFlavour(Flavour):
 
-    priority: Priority = inf
+    priority: Priority = Priority.FIRST
 
     @staticmethod
     def apply_to(ingredient: Ingredient) -> Ingredient:
         # If is a function
-        if hasattr(ingredient.last, "__annotations__"):
+        if hasattr(ingredient.last, "__annotations__") and "return" in ingredient.last.__annotations__:
             ingredient.formula.type = \
                 ingredient.last.__annotations__.get("return")
             return ingredient
 
         # Covers if it is a class or a generic type
-        ingredient.formula.type = ingredient.last
+        if isclass(ingredient.last):
+            ingredient.formula.type = ingredient.last
+            return ingredient
+
         return ingredient
 
 
@@ -85,6 +93,8 @@ class IdFlavour(Flavour):
 
 
 class TypeFlavour(Flavour):
+
+    priority = Priorized.before(LazyFlavour)
 
     def __init__(self, type: Any) -> None:
         self.type = type
