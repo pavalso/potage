@@ -1,10 +1,11 @@
 from typing import (
     Any,
-    Iterable,
     Iterator,
     Union)
-from abc import ABC
+from abc import ABCMeta
 from enum import IntEnum
+
+from typing_extensions import Self
 
 
 def traverse_subclasses(cls) -> list:
@@ -29,15 +30,7 @@ class Priority(IntEnum):
 
 class Priorized:
 
-    _priority: Priority = Priority.MIDDLE
-
-    @property
-    def priority(self) -> Priority:
-        return self._priority
-
-    @priority.setter
-    def priority(self, value: Priority) -> None:
-        self._priority = value
+    priority: int = Priority.MIDDLE
 
     @staticmethod
     def sort(line: list["Priorized"], reverse=False) -> list["Priorized"]:
@@ -50,28 +43,50 @@ class Priorized:
             for i in range(len(line) - 1)
         )
 
+    @staticmethod
+    def after(cls: "Priorized") -> int:
+        return cls.priority - 1
 
-# Not thread safe
-class Decorable(Priorized, ABC, Iterable):
+    @staticmethod
+    def before(cls: "Priorized") -> int:
+        return cls.priority + 1
+
+
+class DecorableMeta(ABCMeta):
+
+    def __call__(cls, *args, **kwds):
+        obj = cls.__new__(cls, *args, **kwds)
+        decorates = kwds.get("decorates", None)
+        if "decorates" in kwds:
+            del kwds["decorates"]
+        elif len(args) > 0:
+            decorates = args[0]
+            args = args[1:]
+        obj.__init__(*args, **kwds)
+        obj._decorator = decorates
+        return obj
+
+    def __new__(
+            cls,
+            name, bases, namespace, **kwds) -> Self:
+        instance = super().__new__(cls, name, bases, namespace, **kwds)
+        return instance
+
+
+class Decorable(Priorized, metaclass=DecorableMeta):
 
     _decorator: Any = None
-    _last: Any = None
-    __iter_last: Any = None
 
     @property
     def last(self) -> Any:
-        if self._last is not None:
-            return self._last
-
-        self._last = list(self)[-1]
-        return self._last
+        return list(self)[-1].decorator
 
     @property
     def decorator(self) -> Any:
         return self._decorator
 
-    def __init__(self, decorator: Union["Decorable", Any] = None) -> None:
-        self._decorator = decorator
+    def __init__(self, decorates=None) -> None:
+        super().__init__()
 
     def __iter__(self) -> Iterator["Decorable"]:
         self.__iter_last = self
@@ -82,21 +97,34 @@ class Decorable(Priorized, ABC, Iterable):
         if isinstance(self.__iter_last, Decorable):
             self.__iter_last = self.__iter_last.decorator
             return _r
-        self.__iter_last = None
-        if _r is not None:
-            return _r
         raise StopIteration
 
     @staticmethod
-    def sort(decorable: "Decorable") -> "Decorable":
-        line: list[Decorable] = list(decorable)[:-1]
+    def sort(decorable: "Decorable") -> list["Decorable"]:
+        line: list[Decorable] = list(decorable)
         last = decorable.last
-        line = Priorized.sort(line, reverse=True)
-        for next in line:
+        line = Priorized.sort(line)
+        for next in line[::-1]:
             next._decorator = last
             last = next
-        return line[-1]
+        return line
 
     @staticmethod
     def is_ordered(decorable: "Decorable") -> bool:
         return Priorized.is_ordered(list(decorable)[:-1])
+
+    @staticmethod
+    def from_list(
+            last: Union["Decorable", Any],
+            line: list["Decorable"]) -> "Decorable":
+        if not line:
+            return last
+
+        sorted_line: list[Decorable] = Priorized.sort(line, reverse=True)
+
+        _old = last
+        for decorable in sorted_line:
+            ret = decorable(decorates=_old)
+            _old = ret
+
+        return Decorable.sort(_old)[0]

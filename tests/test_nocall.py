@@ -11,8 +11,9 @@ def reset():
 
 
 def test_no_call_ingredient():
-    @pypotage.prepare
-    @pypotage.no_call
+    @pypotage.prepare(
+        pypotage.no_call
+    )
     def test_ingredient() -> Callable:
         raise Exception("Should be raised on take_out")
 
@@ -23,12 +24,13 @@ def test_no_call_ingredient():
         ...
 
     pytest.raises(
-        RuntimeError, pypotage.prepare, pypotage.no_call(test_ingredient2))
+        RuntimeError, pypotage.prepare(pypotage.no_call), test_ingredient2)
 
 
 def test_no_call_class_ingredient():
-    @pypotage.prepare
-    @pypotage.no_call
+    @pypotage.prepare(
+        pypotage.no_call
+    )
     class TestClass:
         def __init__(self) -> None:
             raise Exception("Should be raised on take_out")
@@ -38,9 +40,10 @@ def test_no_call_class_ingredient():
 
 
 def test_no_call_lazy_ingredient():
-    @pypotage.prepare
-    @pypotage.no_call
-    @pypotage.lazy
+    @pypotage.prepare(
+        pypotage.lazy,
+        pypotage.no_call
+    )
     class TestClass:
         def __init__(self) -> None:
             raise Exception("Should be raised on take_out")
@@ -48,9 +51,10 @@ def test_no_call_lazy_ingredient():
     func = pypotage.cook(TestClass).take_out()
     pytest.raises(Exception, func)
 
-    @pypotage.prepare
-    @pypotage.lazy
-    @pypotage.no_call
+    @pypotage.prepare(
+        pypotage.lazy,
+        pypotage.no_call
+    )
     def test_ingredient() -> Callable:
         raise Exception("Should be raised on take_out")
 

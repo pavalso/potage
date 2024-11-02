@@ -16,18 +16,18 @@ class Pot:
 
     def add(self, ingredient: Ingredient) -> Ingredient:
         _l = self.ingredients.setdefault(
-            (ingredient.formula._type, ingredient.formula._id), [])
+            (ingredient.formula.type, ingredient.formula.id), [])
         _l.insert(0, ingredient)
         return ingredient
 
     def get(self, formula: IngredientData) -> Ingredient:
-        classes = [formula._type]
-        classes.extend(traverse_subclasses(formula._type))
+        classes = [formula.type]
+        classes.extend(traverse_subclasses(formula.type))
 
         ingredients = []
 
         for _type in classes:
-            ingredient = self.ingredients.get((_type, formula._id))
+            ingredient = self.ingredients.get((_type, formula.id))
             if ingredient is not None:
                 ingredients.extend(ingredient)
 

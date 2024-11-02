@@ -54,23 +54,23 @@ class GenericChef(Chef):
     @staticmethod
     def _modify_formula(formula: IngredientData) -> IngredientData:
         formula.extra["__generic_type__"] = \
-            GenericChef._get_bases(formula._type)
-        if hasattr(formula._type, "__origin__"):
-            formula._type = formula._type.__origin__
+            GenericChef._get_bases(formula.type)
+        if hasattr(formula.type, "__origin__"):
+            formula.type = formula.type.__origin__
         return formula
 
     def prepare(self,
                 ingredient: Ingredient) -> Ingredient:
-        if not self._is_generic(ingredient.formula._type):
+        if not self._is_generic(ingredient.formula.type):
             return ingredient
         ingredient.formula = self._modify_formula(ingredient.formula)
         return ingredient
 
     def cook(self,
              line: IngredientProxy) -> IngredientProxy:
-        if self._is_generic(line.formula._type):
+        if self._is_generic(line.formula.type):
             line.formula = self._modify_formula(line.formula)
-        return _GenericIngredientProxy(_f=line, formula=line.formula)
+        return _GenericIngredientProxy(formula=line.formula, decorates=line)
 
 
 class _ListIngredientProxy(IngredientProxy):
@@ -96,7 +96,7 @@ class ListChef(Chef):
         return ingredient
 
     def cook(self, line: IngredientProxy) -> IngredientProxy:
-        if not getattr(line.formula._type, "__origin__", None) == list:
+        if not getattr(line.formula.type, "__origin__", None) == list:
             return line
-        line.formula._type = line.formula._type.__args__[0]
-        return _ListIngredientProxy(_f=line, formula=line.formula)
+        line.formula.type = line.formula.type.__args__[0]
+        return _ListIngredientProxy(formula=line.formula, decorates=line)

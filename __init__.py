@@ -1,24 +1,68 @@
 from src import pypotage
-
 import logging
 
 
 if __name__ == "__main__":
-    class Proof:
+    di = pypotage.cook(logging.Logger)
+
+    print(di.is_present())
+
+    @pypotage.prepare(
+        pypotage.lazy)
+    def prepare2() -> logging.Logger:
+        print("Hello, World 2!")
+        logger = logging.getLogger("Test2")
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        return logger
+
+    print(di.is_present(), di.take_out())
+
+    @pypotage.prepare(
+        pypotage.lazy)
+    def prepare1() -> logging.Logger:
+        print("Hello, World 1!")
+        logger = logging.getLogger("Test1")
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        return logger
+
+    print(di.is_present(), di.take_out())
+    prepare1().info("Hello, World 1!")
+
+    @pypotage.prepare(
+        pypotage.lazy,
+        pypotage.primary,
+        pypotage.no_call,
+        pypotage.order(1),
+        pypotage.id("logger"),
+        pypotage.type(logging.Logger)
+    )
+    class TestClass:
 
         logger = pypotage.cook(logging.Logger)
 
-        def test(self):
-            print(self.logger)
-            self.logger.info("Hello, World!")
+        def do_test(self):
+            self.logger.info("Test")
 
-    proof = Proof()
+    x = TestClass()
+    x.do_test()
 
-    @pypotage.prepare
-    @pypotage.primary
-    def prepare():
-        print("Hello, World!")
-        logger = logging.getLogger("Proof")
+    @pypotage.prepare(
+        pypotage.lazy,
+        pypotage.primary
+    )
+    def prepare3() -> logging.Logger:
+        print("Hello, World 3!")
+        logger = logging.getLogger("Test3")
         logger.setLevel(logging.INFO)
         formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -27,20 +71,10 @@ if __name__ == "__main__":
         logger.addHandler(handler)
         return logger
 
+    x.do_test()
+    
     @pypotage.prepare
-    @pypotage.lazy
-    def prepare2() -> logging.Logger:
-        print("Hello, World 2!")
-        logger = logging.getLogger("Test")
-        logger.setLevel(logging.INFO)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        return logger
-
-    proof.test()
-    proof.test()
-
-    print(pypotage.cook(str).is_present())
+    def test():
+        return 1
+    
+    print(pypotage.cook(int).take_out())
