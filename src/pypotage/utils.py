@@ -1,11 +1,13 @@
+from dataclasses import dataclass, field
 from typing import (
     Any,
+    Callable,
     Iterator,
+    Protocol,
+    TypeVar,
     Union)
 from abc import ABCMeta
 from enum import IntEnum
-
-from typing_extensions import Self
 
 
 def traverse_subclasses(cls) -> list:
@@ -28,12 +30,14 @@ class Priority(IntEnum):
     FIRST = 40000
 
 
+_B = TypeVar("_B", bound="Priorized")
+
 class Priorized:
 
     priority: int = Priority.MIDDLE
 
     @staticmethod
-    def sort(line: list["Priorized"], reverse=False) -> list["Priorized"]:
+    def sort(line: list[_B], reverse=False) -> list[_B]:
         return sorted(line, key=lambda x: x.priority, reverse=not reverse)
 
     @staticmethod
@@ -63,27 +67,22 @@ class DecorableMeta(ABCMeta):
             decorates = args[0]
             args = args[1:]
         obj.__init__(*args, **kwds)
-        obj._decorator = decorates
+        obj.decorator = decorates
         return obj
 
     def __new__(
             cls,
-            name, bases, namespace, **kwds) -> Self:
-        instance = super().__new__(cls, name, bases, namespace, **kwds)
-        return instance
+            name, bases, namespace, **kwds):
+        return super().__new__(cls, name, bases, namespace, **kwds)
 
 
 class Decorable(Priorized, metaclass=DecorableMeta):
 
-    _decorator: Any = None
+    decorator: Any = None
 
     @property
     def last(self) -> Any:
         return list(self)[-1].decorator
-
-    @property
-    def decorator(self) -> Any:
-        return self._decorator
 
     def __init__(self, decorates=None) -> None:
         super().__init__()
@@ -105,7 +104,7 @@ class Decorable(Priorized, metaclass=DecorableMeta):
         last = decorable.last
         line = Priorized.sort(line)
         for next in line[::-1]:
-            next._decorator = last
+            next.decorator = last
             last = next
         return line
 
@@ -124,7 +123,28 @@ class Decorable(Priorized, metaclass=DecorableMeta):
 
         _old = last
         for decorable in sorted_line:
-            ret = decorable(decorates=_old)
-            _old = ret
+            decorable.decorator = _old
+            _old = decorable
 
         return Decorable.sort(_old)[0]
+
+
+
+class Chainned(Protocol):
+
+    def __call__(self, next: "Chain") -> Any:
+        ...
+
+
+@dataclass(kw_only=True)
+class Chain(Callable):
+    __chain__: list[Chainned] = field(default_factory=list)
+    __index__: int = 0
+
+    def __call__(self, *args, **kwargs) -> Any:
+        """Allows to be passed to the next ingredient in the chain. Keeps track of the chain."""
+        if self.__index__ >= len(self.__chain__):
+            raise StopIteration
+        self.__index__ += 1
+        kwargs["next"] = self
+        return self.__chain__[self.__index__](*args, **kwargs)
