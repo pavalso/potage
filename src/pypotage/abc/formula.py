@@ -2,7 +2,7 @@ from dataclasses import (
     dataclass,
     field
 )
-from typing import Any
+from typing import Type
 from math import inf
 
 from ..utils import Priority
@@ -11,7 +11,7 @@ from ..utils import Priority
 @dataclass
 class Formula:
 
-    type: Any = None
+    type: Type = None
     id: str = None
     lazy: bool = False
     primary: bool = False

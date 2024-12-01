@@ -9,24 +9,21 @@ from .abc import (
 
 from .implementations import (
     flavours,
-    ingredientProxies,
-    chefs
+    waiters,
+    chefs,
+    orders
 )
 
-from .implementations.ingredientProxies.ingredientProxyImpl import IngredientProxyImpl as IngredientProxy
-from .implementations.potImpl import PotImpl as Pot
-from .implementations.kitchenImpl import KitchenImpl as Kitchen
-from .implementations.chefLineImpl import ChefLineImpl as ChefLine
+from .implementations.waiters.waiter import Waiter
+from .implementations.pot import Pot
+from .implementations.kitchen import Kitchen
+from .implementations.chefLine import ChefLine
+from .implementations.orders import Order
+from .implementations.ingredient import Ingredient
 
-DEFAULT_CHEFS: list[abc.Chef] = [
-    chefs.ListChef,
-    chefs.GenericChef,
-    chefs.PackedMealChef
-]
-DEFAULT_FLAVOURS: list[abc.Chef] = [
-    flavours.ForcedTypeFlavour,
-    flavours.StaticTypeCheckerFlavour
-]
+from .implementations.chefs import DEFAULT_CHEFS
+from .implementations.flavours import DEFAULT_FLAVOURS
+
 
 lazy = flavours.LazyFlavour
 no_call = flavours.NoCallFlavour
@@ -36,23 +33,20 @@ id = flavours.IdFlavour
 type = flavours.TypeFlavour
 
 def __prepare_kitchen() -> abc.Kitchen:
-    return Kitchen(
-        pot=Pot(),
-        chefs=ChefLine(DEFAULT_CHEFS),
-        flavours=DEFAULT_FLAVOURS
-    )
+    return Kitchen()
 
 kitchen_ = __prepare_kitchen()
 
 prepare = kitchen_.prepare
 cook = kitchen_.cook
-extract_ingredient = kitchen_.extract_ingredient
+get_order = kitchen_.get_order
 is_cooked = kitchen_.is_cooked
+is_prepared = kitchen_.is_prepared
 unpack = kitchen_.unpack
 
 __all__ = [
     "Flavour",
-    "IngredientProxy",
+    "Waiter",
     "Formula",
     "Pot",
     "Kitchen",
@@ -60,7 +54,7 @@ __all__ = [
     "ChefLine",
     "chefs",
     "flavours",
-    "ingredientProxies",
+    "waiters",
     "Priority",
     "lazy",
     "no_call",
@@ -74,5 +68,10 @@ __all__ = [
     "extract_ingredient",
     "is_cooked",
     "unpack",
-    "abc"
+    "abc",
+    "orders",
+    "Order",
+    "DEFAULT_CHEFS",
+    "DEFAULT_FLAVOURS",
+    "Ingredient"
 ]

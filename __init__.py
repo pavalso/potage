@@ -5,34 +5,22 @@ import logging
 import traceback
 
 
-_T = TypeVar("_T")
-class Test(Generic[_T]): ...
-
-
-@pypotage.prepare(
-    pypotage.no_call
-)
-def test() -> pypotage.Kitchen:
-    return pypotage.kitchen_
-
 if __name__ == "__main__":
-    print(pypotage.cook(pypotage.IngredientProxy[logging.Logger]))
-
     di = pypotage.cook(logging.Logger)
 
     print(pypotage.is_cooked(di))
     print(pypotage.is_cooked(logging.Logger))
 
-    print(pypotage.extract_ingredient(di))
+    print(pypotage.get_order(di))
 
     try:
-        print(pypotage.extract_ingredient(1))
+        print(pypotage.get_order(1))
         exit(-1)
     except:
         traceback.print_exc()
 
-    ingr = pypotage.extract_ingredient(di)
-    print(ingr.is_present())
+    ingr = pypotage.get_order(di)
+    print(ingr.is_prepared())
     print(type(di))
 
     @pypotage.prepare(
@@ -49,8 +37,11 @@ if __name__ == "__main__":
         logger.addHandler(handler)
         return logger
 
-    print(ingr.is_present())
+    print(ingr.is_prepared())
     print(type(di))
+    print("----------------")
+    print(di)
+    print("----------------")
     print(di)
 
     @pypotage.prepare(
@@ -103,11 +94,23 @@ if __name__ == "__main__":
 
     x.do_test()
 
+    ints = pypotage.cook(list[int])
+
+    print(ints)
+
     @pypotage.prepare
     def test():
         return 1
 
     print(pypotage.cook(int))
+    print(ints)
+    print(ints)
+
+    @pypotage.prepare
+    def test():
+        return 2
+
+    print(ints)
     
     a = pypotage.cook(int)
 
@@ -133,6 +136,9 @@ if __name__ == "__main__":
 
     print(pypotage.cook(logging.Logger, "logger"))
 
+    _T = TypeVar("_T")
+    class Test(Generic[_T]): ...
+
     @pypotage.prepare(
         pypotage.type(Test[int])
     )
@@ -150,88 +156,24 @@ if __name__ == "__main__":
     cook = pypotage.cook(Test[int])
     print(type(pypotage.unpack(cook)), type(cook))
 
+    print("----------------")
+    print(di)
+    print("----------------")
+    print(di)
 
-from objproxies import ObjectProxy, CallbackProxy
+    print(di)
 
-class DynamicMeta(type):
-    def __call__(self, *args, **kwds):
-        instance = super().__call__(*args, **kwds)
+    x.do_test()
 
-        class UniqueMeta(type):
-            def __repr__(_):
-                return repr(instance.__class__)
+    print(ints)
+    j = pypotage.cook(int)
+    print(j)
+    
+    @pypotage.prepare
+    def test():
+        return 3
 
-        # Dynamically create a new class with UniqueMeta as its metaclass
-        class __Wrap__(ObjectProxy, metaclass=UniqueMeta): ...
-
-        return __Wrap__(instance)
-
-class PackedMeal(CallbackProxy, metaclass = DynamicMeta):
-    ...
-
-def func():
-    return "Hello"
-
-a = PackedMeal(func) 
-
-print(type(a))
-
-import timeit
-
-setup_code = """
-from objproxies import CallbackProxy
-
-class DynamicMeta(type):
-    def __call__(self, *args, **kwds):
-        class UniqueMeta(type):
-            def __repr__(_):
-                return repr(self)
-
-        class Test(CallbackProxy, metaclass=UniqueMeta): ...
-
-        instance = super().__call__(*args, **kwds)
-        return Test(lambda: instance)
-
-class OutTest(metaclass=DynamicMeta):
-    def do_test(self):
-        return "Doing a test!"
-
-"""
-
-check_code = """
-class OutTest():
-    def do_test(self):
-        return "Doing a test!"
-
-"""
-
-no_meta_code = """
-from objproxies import CallbackProxy
-
-class _OutTest:
-    def do_test(self):
-        return "Doing a test!"
-
-class OutTest(CallbackProxy):
-    def __init__(self):
-        instance = _OutTest()
-        super().__init__(lambda: instance)
-
-"""
-
-test_code = """
-a = OutTest()
-a.do_test()
-"""
-
-# Measure the time taken to create an instance and call a method
-execution_time = timeit.timeit(test_code, setup=setup_code, number=10000)
-print(f"Execution time for 1000 iterations: {execution_time} seconds")
-
-# Measure the time taken to create an instance and call a method
-execution_time = timeit.timeit(test_code, setup=check_code, number=10000)
-print(f"Execution time for 1000 iterations: {execution_time} seconds")
-
-# Measure the time taken to create an instance and call a method
-execution_time = timeit.timeit(test_code, setup=no_meta_code, number=10000)
-print(f"Execution time for 1000 iterations: {execution_time} seconds")
+    print(j)
+    
+    print(pypotage.cook(int))
+    print(ints)

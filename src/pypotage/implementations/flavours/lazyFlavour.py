@@ -1,16 +1,16 @@
-from ...abc.flavour import Flavour
+from ...abc.flavourABC import FlavourABC
 from ...utils import Priorized
 from .staticTypeCheckerFlavour import StaticTypeCheckerFlavour
 
 
-class LazyFlavour(Flavour):
+class LazyFlavour(FlavourABC):
 
     priority = Priorized.after(StaticTypeCheckerFlavour)
 
     @classmethod
-    def apply_to(cls, meal):
-        if meal.formula.type is None:
+    def apply_to(cls_or_self, ingredient):
+        if ingredient.formula.type is None:
             raise RuntimeError("Lazy ingredients must explicitly \
                 define a type")
 
-        meal.formula.lazy = True
+        ingredient.formula.lazy = True

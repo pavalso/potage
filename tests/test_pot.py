@@ -5,7 +5,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.kitchen_.pot.ingredients.clear()
+    pypotage.kitchen_.pot.clear()
 
 
 def test_prepare_normal_take_out_cases():
@@ -13,25 +13,25 @@ def test_prepare_normal_take_out_cases():
     def bean1() -> str:
         return "bean1"
 
-    assert pypotage.cook(str).take_out() == "bean1"
+    assert pypotage.cook(str) == "bean1"
 
     @pypotage.prepare
     def bean2() -> str:
         return "bean2"
 
-    assert pypotage.cook(str).take_out() == "bean2"
+    assert pypotage.cook(str) == "bean2"
 
     @pypotage.prepare()
     def bean3() -> int:
         return 1
 
-    assert pypotage.cook(int).take_out() == 1
+    assert pypotage.cook(int) == 1
 
     @pypotage.prepare
     def bean4():
         return "bean4"
 
-    assert pypotage.cook(str).take_out() == "bean4"
+    assert pypotage.cook(str) == "bean4"
 
 
 def test_prepare_ordered_take_out_cases():
@@ -39,7 +39,7 @@ def test_prepare_ordered_take_out_cases():
     def bean1() -> str:
         return "bean1"
 
-    assert pypotage.cook(str).take_out() == "bean1"
+    assert pypotage.cook(str) == "bean1"
 
     @pypotage.prepare(
         pypotage.order(1)
@@ -47,7 +47,7 @@ def test_prepare_ordered_take_out_cases():
     def bean2() -> str:
         return "bean2"
 
-    assert pypotage.cook(str).take_out() == "bean2"
+    assert pypotage.cook(str) == "bean2"
 
     @pypotage.prepare(
         pypotage.order(999)
@@ -55,7 +55,7 @@ def test_prepare_ordered_take_out_cases():
     def bean3() -> str:
         return "bean3"
 
-    assert pypotage.cook(str).take_out() == "bean2"
+    assert pypotage.cook(str) == "bean2"
 
 
 def test_prepare_primary_take_out_cases():
@@ -63,7 +63,7 @@ def test_prepare_primary_take_out_cases():
     def bean1() -> str:
         return "bean1"
 
-    assert pypotage.cook(str).take_out() == "bean1"
+    assert pypotage.cook(str) == "bean1"
 
     @pypotage.prepare(
         pypotage.primary
@@ -71,13 +71,13 @@ def test_prepare_primary_take_out_cases():
     def bean2() -> str:
         return "bean2"
 
-    assert pypotage.cook(str).take_out() == "bean2"
+    assert pypotage.cook(str) == "bean2"
 
     @pypotage.prepare
     def bean3() -> str:
         return "bean3"
 
-    assert pypotage.cook(str).take_out() == "bean2"
+    assert pypotage.cook(str) == "bean2"
 
 
 def test_defered_take_out():
@@ -87,7 +87,7 @@ def test_defered_take_out():
     def bean1() -> str:
         return "bean1"
 
-    assert proxy.take_out() == "bean1"
+    assert proxy == "bean1"
 
 
 def test_ingredient_proxy_is_present():
@@ -95,14 +95,14 @@ def test_ingredient_proxy_is_present():
     def bean1() -> str:
         return "bean1"
 
-    assert pypotage.cook(str).is_present()
-    assert not pypotage.cook(int).is_present()
+    assert pypotage.cook(str)
+    assert not pypotage.is_prepared(pypotage.cook(int))
 
     @pypotage.prepare
     def bean2() -> int:
         return 1
 
-    assert pypotage.cook(int).is_present()
+    assert pypotage.is_prepared(pypotage.cook(int))
 
 
 def test_cook_allows_subclasses():
@@ -116,8 +116,8 @@ def test_cook_allows_subclasses():
     def bean():
         return BeanSub()
 
-    assert pypotage.cook(Bean).is_present()
-    assert pypotage.cook(BeanSub).is_present()
+    assert pypotage.is_prepared(pypotage.cook(Bean))
+    assert pypotage.is_prepared(pypotage.cook(BeanSub))
 
 
 def test_cook_lazy():
@@ -136,8 +136,7 @@ def test_cook_lazy():
     def bean() -> Bean:
         return Bean()
 
-    assert pypotage.cook(Bean).is_present()
-    pytest.raises(Exception, pypotage.cook(Bean).take_out)
+    pytest.raises(Exception, pypotage.unpack, pypotage.cook(Bean))
 
 
 def test_cook_lazy_not_annot():

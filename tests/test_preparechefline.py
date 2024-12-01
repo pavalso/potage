@@ -4,19 +4,21 @@ from src import pypotage
 
 
 class _TestChef(pypotage.Chef):
-    def prepare(self, ingredient):
+    @classmethod
+    def prepare(cls_or_self, ingredient):
         ingredient.formula.id = "test"
         ingredient.formula.type = str
         return ingredient
 
-    def cook(self, line):
-        line.formula.type = str
-        return line
+    @classmethod
+    def cook(cls_or_self, order):
+        order.formula.type = str
+        return order
 
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.kitchen_.pot.ingredients.clear()
+    pypotage.kitchen_.pot.clear()
 
 
 def test_preparechefline_works():
@@ -24,12 +26,12 @@ def test_preparechefline_works():
     def bean_1():
         return 1
 
-    assert pypotage.cook(int).take_out() == 1
+    assert pypotage.cook(int) == 1
 
-    pypotage.kitchen_.chef_line.add(_TestChef())
+    pypotage.kitchen_.chef_line.add(_TestChef)
 
     @pypotage.prepare
     def bean_2():
         return 1
 
-    assert pypotage.cook(str, "test").take_out() == 1
+    assert pypotage.cook(str, "test") == 1

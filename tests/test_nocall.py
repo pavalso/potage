@@ -7,7 +7,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.kitchen_.pot.ingredients.clear()
+    pypotage.kitchen_.pot.clear()
 
 
 def test_no_call_ingredient():
@@ -17,7 +17,7 @@ def test_no_call_ingredient():
     def test_ingredient() -> Callable:
         raise Exception("Should be raised on take_out")
 
-    func = pypotage.cook(Callable).take_out()
+    func = pypotage.cook(Callable)
     pytest.raises(Exception, func)
 
     def test_ingredient2():
@@ -35,7 +35,7 @@ def test_no_call_class_ingredient():
         def __init__(self) -> None:
             raise Exception("Should be raised on take_out")
 
-    func = pypotage.cook(TestClass).take_out()
+    func = pypotage.cook(TestClass)
     pytest.raises(Exception, func)
 
 
@@ -48,7 +48,7 @@ def test_no_call_lazy_ingredient():
         def __init__(self) -> None:
             raise Exception("Should be raised on take_out")
 
-    func = pypotage.cook(TestClass).take_out()
+    func = pypotage.cook(TestClass)
     pytest.raises(Exception, func)
 
     @pypotage.prepare(
@@ -58,5 +58,5 @@ def test_no_call_lazy_ingredient():
     def test_ingredient() -> Callable:
         raise Exception("Should be raised on take_out")
 
-    func = pypotage.cook(Callable).take_out()
+    func = pypotage.cook(Callable)
     pytest.raises(Exception, func)

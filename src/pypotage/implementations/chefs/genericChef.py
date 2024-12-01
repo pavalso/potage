@@ -1,25 +1,24 @@
 from typing import Generic
 
-from ...abc.meal import Meal
-from ...abc.chef import Chef
-from ...abc.ingredientProxy import IngredientProxy
+from ...abc.chefABC import ChefABC
 from ...abc.formula import Formula
-from ..ingredientProxies import GenericIngredientProxy
+from ..waiters import GenericWaiter
 
 
-class GenericChef(Chef):
+class GenericChef(ChefABC):
 
     @staticmethod
     def _is_generic(_type: type) -> bool:
-        return hasattr(_type, "__origin__") and \
+        return isinstance(_type, type) and \
+            issubclass(_type, Generic) or \
+            hasattr(_type, "__origin__") and \
             issubclass(_type.__origin__, Generic)
 
     @staticmethod
     def _get_bases(_type: type) -> list[tuple[type, tuple[type]]]:
         if hasattr(_type, "__origin__"):
-            return [(_type.__origin__, _type.__args__)]
-        bases = _type.__orig_bases__
-        return [(base.__origin__, base.__args__) for base in bases]
+            return (_type,)
+        return _type.__orig_bases__
 
     @staticmethod
     def _modify_formula(formula: Formula) -> Formula:
@@ -29,15 +28,15 @@ class GenericChef(Chef):
             formula.type = formula.type.__origin__
         return formula
 
-    @staticmethod
-    def prepare(meal) -> None:
-        if not GenericChef._is_generic(meal.formula.type):
+    @classmethod
+    def prepare(cls_or_self, ingredient):
+        if not GenericChef._is_generic(ingredient.formula.type):
             return
-        meal.formula = GenericChef._modify_formula(meal.formula)
+        ingredient.formula = GenericChef._modify_formula(ingredient.formula)
 
-    @staticmethod
-    def cook(line: IngredientProxy) -> IngredientProxy:
-        if not GenericChef._is_generic(line.formula.type):
-            return line
-        line.formula = GenericChef._modify_formula(line.formula)
-        return GenericIngredientProxy(formula=line.formula, decorates=line)
+    @classmethod
+    def cook(cls_or_self, order):
+        if not GenericChef._is_generic(order.formula.type):
+            return
+        order.formula = GenericChef._modify_formula(order.formula)
+        order.add(GenericWaiter)

@@ -1,6 +1,6 @@
 from objproxies import ObjectProxy
 
-from .packedMealImpl import PackedMealImpl
+from .orders.order import PackedMeal
 
 
 class DynamicMeta(type):
@@ -17,4 +17,4 @@ class DynamicMeta(type):
         return __Wrap__(instance)
 
 
-class FullyProxiedPackedMeal(PackedMealImpl, metaclass = DynamicMeta): ...
+class FullyProxiedPackedMeal(PackedMeal, metaclass = DynamicMeta): ...

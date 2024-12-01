@@ -1,19 +1,19 @@
-from ...abc.flavour import Flavour
+from ...abc.flavourABC import FlavourABC
 from ...utils import Priority
 
 
-class ForcedTypeFlavour(Flavour):
+class ForcedTypeFlavour(FlavourABC):
 
     priority = Priority.LAST
 
     @classmethod
-    def apply_to(cls, meal):
-        if meal.formula.type is not None:
+    def apply_to(cls_or_self, ingredient):
+        if ingredient.formula.type is not None:
             return
 
-        ingr_return = meal.root()
+        ingr_return = ingredient.resolve()
 
         if hasattr(ingr_return, "__orig_class__"):
-            meal.formula.type = ingr_return.__orig_class__
+            ingredient.formula.type = ingr_return.__orig_class__
         else:
-            meal.formula.type = type(ingr_return)
+            ingredient.formula.type = type(ingr_return)

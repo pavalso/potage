@@ -1,24 +1,24 @@
 from inspect import isclass
 
-from ...abc.flavour import Flavour
+from ...abc.flavourABC import FlavourABC
 from ...utils import Priority
 
 
-class StaticTypeCheckerFlavour(Flavour):
+class StaticTypeCheckerFlavour(FlavourABC):
 
     priority = Priority.FIRST
 
     @classmethod
-    def apply_to(cls, meal):
-        og_function = meal.root.resolve
+    def apply_to(cls_or_self, ingredient):
+        resolver = ingredient.resolve
 
         # If is a function
-        if hasattr(og_function, "__annotations__") \
-                and "return" in og_function.__annotations__:
-            meal.formula.type = og_function.__annotations__.get("return")
+        if hasattr(resolver, "__annotations__") \
+                and "return" in resolver.__annotations__:
+            ingredient.formula.type = resolver.__annotations__.get("return")
             return
 
         # Covers if it is a class or a generic type
-        if isclass(og_function):
-            meal.formula.type = og_function
+        if isclass(resolver):
+            ingredient.formula.type = resolver
             return

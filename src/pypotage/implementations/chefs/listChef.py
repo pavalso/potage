@@ -1,16 +1,16 @@
-from ...abc.chef import Chef
-from ...abc.ingredientProxy import IngredientProxy
+from ...abc.chefABC import ChefABC
 from .genericChef import GenericChef
-from ..ingredientProxies import ListIngredientProxy
+from ..waiters import ListOrder
 
 
-class ListChef(Chef):
+class ListChef(ChefABC):
 
-    priority = Chef.before(GenericChef)
+    priority = ChefABC.before(GenericChef)
 
-    @staticmethod
-    def cook(line: IngredientProxy) -> IngredientProxy:
-        if not getattr(line.formula.type, "__origin__", None) == list:
-            return line
-        line.formula.type = line.formula.type.__args__[0]
-        return ListIngredientProxy(formula=line.formula, decorates=line)
+    @classmethod
+    def cook(cls_or_self, order):
+        if not getattr(order.formula.type, "__origin__", None) == list:
+            return
+        order.formula.type = order.formula.type.__args__[0]
+
+        return ListOrder.copy_from(order)

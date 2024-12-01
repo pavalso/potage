@@ -1,17 +1,13 @@
-from ...abc.ingredient import Ingredient
+from ...abc.flavourABC import FlavourABC
 from .lazyFlavour import LazyFlavour
 
 
-class NoCallFlavour(LazyFlavour):
-
-    class NoCallIngredient(Ingredient):
-
-        @classmethod
-        def __call__(cls, next):
-            return next
+class NoCallFlavour(FlavourABC):
 
     @classmethod
-    def apply_to(cls, meal):
-        LazyFlavour.apply_to(meal)
+    def apply_to(cls_or_self, ingredient):
+        LazyFlavour.apply_to(ingredient)
 
-        meal.add(cls.NoCallIngredient)
+        resolve = ingredient.resolve
+
+        ingredient.resolve = lambda: resolve

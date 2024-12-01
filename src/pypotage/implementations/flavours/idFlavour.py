@@ -1,10 +1,10 @@
-from ...abc.flavour import Flavour
+from ...abc.flavourABC import FlavourABC
 
 
-class IdFlavour(Flavour):
+class IdFlavour(FlavourABC):
 
     def __init__(self, id: str) -> None:
         self.id = id
 
-    def apply_to(self, meal):
-        meal.formula.id = self.id
+    def apply_to(cls_or_self, ingredient):
+        ingredient.formula.id = cls_or_self.id

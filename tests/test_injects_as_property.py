@@ -5,7 +5,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.kitchen_.pot.ingredients.clear()
+    pypotage.kitchen_.pot.clear()
 
 
 def test_usable_as_property():
@@ -15,7 +15,7 @@ def test_usable_as_property():
 
     test_object = Tests()
 
-    pytest.raises(RuntimeError, lambda: test_object.test_attribute)
+    pytest.raises(RuntimeError, test_object.test_attribute)
 
     @pypotage.prepare
     def test() -> str:

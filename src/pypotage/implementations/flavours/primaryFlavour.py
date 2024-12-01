@@ -1,8 +1,8 @@
-from ...abc.flavour import Flavour
+from ...abc.flavourABC import FlavourABC
 
 
-class PrimaryFlavour(Flavour):
+class PrimaryFlavour(FlavourABC):
 
     @classmethod
-    def apply_to(meal):
-        meal.formula.primary = True
+    def apply_to(cls_or_self, ingredient):
+        ingredient.formula.primary = True
