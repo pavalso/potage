@@ -151,3 +151,7 @@ def test_cook_lazy_not_annot():
     class Bean:
         def __init__(self):
             raise Exception("Should be called on take_out() (On lazy beans)")
+
+def test_remove_ingredient():
+    ingredient = pypotage.kitchen_.pot.add(pypotage.Ingredient(resolve=lambda: "bean2", formula=pypotage.Formula(type=str)))
+    pypotage.kitchen_.pot.remove(ingredient)

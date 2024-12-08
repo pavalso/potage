@@ -151,7 +151,19 @@ if __name__ == "__main__":
     def test1():
         return "1"
 
-    print(pypotage.cook(Test[int]), pypotage.cook(list[Test]), pypotage.cook(list[Test[str]]))
+    @pypotage.prepare(
+        pypotage.type(Test)
+    )
+    def test1():
+        return True
+
+    @pypotage.prepare(
+        pypotage.type(Test[int])
+    )
+    def test1():
+        return 2
+
+    print(pypotage.cook(list[Test[int]]), pypotage.cook(list[Test]), pypotage.cook(list[Test[str]]))
 
     cook = pypotage.cook(Test[int])
     print(type(pypotage.unpack(cook)), type(cook))

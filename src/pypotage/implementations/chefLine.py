@@ -18,7 +18,8 @@ class ChefLine(ChefLineABC):
         cls_or_self.chefs = ChefABC.sort(cls_or_self.chefs)
 
     def remove(cls_or_self, chef):
-        return super().remove(chef)
+        cls_or_self.chefs.remove(chef)
+        cls_or_self.chefs = ChefABC.sort(cls_or_self.chefs)
 
     def cook(cls_or_self, formula, func, waiters):
         order = Order(formula=formula, waiters=waiters, resolve=func)

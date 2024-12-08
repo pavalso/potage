@@ -5,7 +5,7 @@ from ..waiters import CacheWaiter
 from ...utils import Priority, traverse_subclasses
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class CacheItem:
     checksum: int = 0
 
@@ -46,19 +46,23 @@ class CacheChef(ChefABC):
 
         og_take_out = order.take_out
 
-        def __cache__(*args, **kwargs):
-            cache_waiter.cache_item = cls_or_self.checksums.setdefault(cache_waiter.type, CacheItem())
-
-            if cache_waiter.formula is None:
-                cache_waiter.value = og_take_out(*args, **kwargs)
-                cache_waiter.checksum = cache_waiter.cache_item.checksum
-                return cache_waiter.value
-
-            if cache_waiter.cache_item.checksum == cache_waiter.checksum:
-                return cache_waiter.value
-
-            cache_waiter.value = og_take_out(*args, **kwargs)
-            cache_waiter.checksum = cache_waiter.cache_item.checksum
+        def __return__():
+            if cache_waiter.exception is True:
+                raise cache_waiter.value
             return cache_waiter.value
+
+        def __cache__(*args, **kwargs):
+            if cache_waiter.cache_item is not None and cache_waiter.cache_item.checksum == cache_waiter.checksum:
+                return __return__()
+
+            try:
+                cache_waiter.value = og_take_out()
+                cache_waiter.exception = False
+            except Exception as e:
+                cache_waiter.value = e
+                cache_waiter.exception = True
+            cache_waiter.cache_item = cls_or_self.checksums.setdefault(cache_waiter.type, CacheItem())
+            cache_waiter.checksum = cache_waiter.cache_item.checksum
+            return __return__()
 
         order.take_out = __cache__

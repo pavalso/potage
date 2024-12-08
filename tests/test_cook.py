@@ -26,7 +26,7 @@ def test_take_out_ingredient_retrieves_latest():
     pytest.raises(RuntimeError, pypotage.unpack, pypotage.cook(int))
 
 
-def test_cook_inside_class_is_property():
+def test_cook_inside_class_works():
     class Test:
         cooked_str = pypotage.cook(str)
 
@@ -45,7 +45,24 @@ def test_cook_inside_class_is_property():
     assert test.cooked_str == "bean2"
 
 
-def test_packed_meal_is_present():
+def test_cook_as_function_parameter():
+    @pypotage.prepare
+    def bean1() -> str:
+        return "bean1"
+
+    def test(cooked_str = pypotage.cook(str)):
+        return cooked_str
+
+    assert test() == "bean1"
+
+    @pypotage.prepare
+    def bean2() -> str:
+        return "bean2"
+
+    assert test() == "bean2"
+
+
+def test_cooked_meal_is_prepared():
     cooked_str = pypotage.cook(str)
 
     assert not pypotage.is_prepared(cooked_str)

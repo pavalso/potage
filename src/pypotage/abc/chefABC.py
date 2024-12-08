@@ -20,7 +20,3 @@ class ChefABC(ABC, Priorized):
     @abstractmethod
     def cook(cls_or_self, order: OrderABC) -> OrderABC:
         return order
-
-    @abstractmethod
-    def pack(cls_or_self, order: OrderABC) -> OrderABC:
-        return order

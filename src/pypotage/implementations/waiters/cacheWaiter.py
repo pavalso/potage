@@ -15,6 +15,7 @@ class CacheWaiter(WaiterABC):
         self.value = None
         self.checksum = 0
         self.cache_item = None
+        self.exception = False
 
     def serve(cls_or_self, formula, ingredients):
         cls_or_self.formula = formula

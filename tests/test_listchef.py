@@ -99,3 +99,24 @@ def test_list_chef_solo():
         return "bean2"
 
     assert kitchen_.cook(list[str]) == ["bean2", "bean1"]
+
+
+def test_remove_chef():
+    kitchen_ = pypotage.Kitchen(
+        chefs=[pypotage.chefs.ListChef]
+    )
+
+    @kitchen_.prepare
+    def bean1() -> str:
+        return "bean1"
+
+    @kitchen_.prepare
+    def bean2() -> str:
+        return "bean2"
+
+    assert kitchen_.cook(list[str]) == ["bean2", "bean1"]
+
+    kitchen_.chef_line.remove(pypotage.chefs.ListChef)
+
+    assert len(kitchen_.chef_line.chefs) == 0
+    pytest.raises(RuntimeError, pypotage.unpack, kitchen_.cook(list[str]))
