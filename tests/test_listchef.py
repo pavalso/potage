@@ -5,7 +5,7 @@ from src import pypotage
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.kitchen_.pot.ingredients.clear()
+    pypotage.kitchen_.pot.clear()
 
 
 def test_prepare_list():
@@ -21,7 +21,7 @@ def test_prepare_list():
     def bean3():
         return "bean3"
 
-    assert pypotage.cook(list[str]).take_out() == ["bean3", "bean2", "bean1"]
+    assert pypotage.cook(list[str]) == ["bean3", "bean2", "bean1"]
 
 
 def test_prepare_list_ordered():
@@ -43,7 +43,7 @@ def test_prepare_list_ordered():
     def bean3():
         return "bean3"
 
-    assert pypotage.cook(list[str]).take_out() == ["bean1", "bean2", "bean3"]
+    assert pypotage.cook(list[str]) == ["bean1", "bean2", "bean3"]
 
 
 def test_prepare_list_primary():
@@ -61,17 +61,16 @@ def test_prepare_list_primary():
     def bean3():
         return "bean3"
 
-    assert pypotage.cook(list[str]).take_out() == ["bean1", "bean3", "bean2"]
+    assert pypotage.cook(list[str]) == ["bean1", "bean3", "bean2"]
 
 
 def test_prepare_list_empty():
-    assert pypotage.cook(list[str]).take_out() == []
+    assert pypotage.cook(list[str]) == []
 
 
 def test_prepare_lazy_list():
     class Bean:
-        def __init__(self):
-            raise Exception("Should be called on take_out() (On lazy beans)")
+        def __init__(self): ...
 
     @pypotage.prepare(
         pypotage.lazy
@@ -79,14 +78,16 @@ def test_prepare_lazy_list():
     def bean() -> Bean:
         return Bean()
 
-    assert pypotage.cook(list[Bean]).is_present()
-    pytest.raises(Exception, pypotage.cook(list[Bean]).take_out)
+    assert pypotage.is_prepared(pypotage.cook(list[Bean]))
+    
+    beans = pypotage.cook(list[Bean])
+    assert len(beans) == 1
+    assert isinstance(beans[0], Bean)
 
 
 def test_list_chef_solo():
     kitchen_ = pypotage.Kitchen(
-        pypotage.Pot(),
-        [pypotage.chefs.ListChef()]
+        chefs=[pypotage.chefs.ListChef]
     )
 
     @kitchen_.prepare
@@ -97,4 +98,25 @@ def test_list_chef_solo():
     def bean2() -> str:
         return "bean2"
 
-    assert kitchen_.cook(list[str]).take_out() == ["bean2", "bean1"]
+    assert kitchen_.cook(list[str]) == ["bean2", "bean1"]
+
+
+def test_remove_chef():
+    kitchen_ = pypotage.Kitchen(
+        chefs=[pypotage.chefs.ListChef]
+    )
+
+    @kitchen_.prepare
+    def bean1() -> str:
+        return "bean1"
+
+    @kitchen_.prepare
+    def bean2() -> str:
+        return "bean2"
+
+    assert kitchen_.cook(list[str]) == ["bean2", "bean1"]
+
+    kitchen_.chef_line.remove(pypotage.chefs.ListChef)
+
+    assert len(kitchen_.chef_line.chefs) == 0
+    pytest.raises(RuntimeError, pypotage.unpack, kitchen_.cook(list[str]))

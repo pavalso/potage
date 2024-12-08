@@ -1,12 +1,11 @@
 import pytest
 
 from src import pypotage
-from tests.utils import RetrieveRawIngredient
 
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.kitchen_.pot.ingredients.clear()
+    pypotage.kitchen_.pot.clear()
 
 
 def test_id_decorator():
@@ -16,8 +15,8 @@ def test_id_decorator():
     def bean1() -> str:
         return "bean1"
 
-    pytest.raises(RuntimeError, pypotage.cook(str).take_out)
-    assert pypotage.cook(str, "bean1").is_present()
+    assert not pypotage.is_prepared(pypotage.cook(str))
+    assert pypotage.is_prepared(pypotage.cook(str, "bean1"))
 
 
 def test_type_decorator():
@@ -27,27 +26,23 @@ def test_type_decorator():
     def bean1() -> int:
         return "bean1"
 
-    pytest.raises(RuntimeError, pypotage.cook(int).take_out)
-    assert pypotage.cook(str).is_present()
+    assert not pypotage.is_prepared(pypotage.cook(int))
+    assert pypotage.is_prepared(pypotage.cook(str))
 
 
 def test_custom_flavour_creation():
     class TestFlavour(pypotage.Flavour):
 
-        @staticmethod
-        def apply_to(
-                ingredient: pypotage.Ingredient) -> pypotage.Ingredient:
-            ingredient.formula.extra["__test__"] = True
-            return ingredient
+        @classmethod
+        def apply_to(cls_or_self, ingredient):
+            ingredient.resolve = lambda: "test"
 
     @pypotage.prepare(
         TestFlavour
     )
-    def test_ingredient() -> str:
-        return "test"
+    def test_ingredient() -> str: ...
 
-    assert pypotage.cook(str, proxies=[RetrieveRawIngredient]).take_out() \
-        .formula.extra["__test__"]
+    assert pypotage.cook(str) == "test"
 
 
 def test_custom_flavour_accepts_arguments():
@@ -56,20 +51,22 @@ def test_custom_flavour_accepts_arguments():
         def __init__(self, value: int):
             self.value = value
 
-        def apply_to(
-                self,
-                ingredient: pypotage.Ingredient) -> pypotage.Ingredient:
-            ingredient.formula.extra["__test__"] = self.value
-            return ingredient
+        def apply_to(cls_or_self, ingredient):
+            ingredient.resolve = lambda: cls_or_self.value
 
     @pypotage.prepare(
         TestArgsFlavour(42)
     )
-    def test_ingredient() -> str:
-        return "test"
+    def test_ingredient() -> str: ...
 
-    assert pypotage.cook(str, proxies=[RetrieveRawIngredient]).take_out() \
-        .formula.extra["__test__"] == 42
+    assert pypotage.cook(str) == 42
+
+    @pypotage.prepare(
+        TestArgsFlavour(value=25)
+    )
+    def test_ingredient() -> str: ...
+
+    assert pypotage.cook(str) == 25
 
 
 def test_custom_flavour_accepts_kwargs():
@@ -78,35 +75,26 @@ def test_custom_flavour_accepts_kwargs():
         def __init__(self, value: int = 1):
             self.value = value
 
-        def apply_to(
-                self,
-                ingredient: pypotage.Ingredient) -> pypotage.Ingredient:
-            ingredient.formula.extra["__test__"] = self.value
-            return ingredient
+        def apply_to(cls_or_self, ingredient):
+            ingredient.resolve = lambda: cls_or_self.value
 
     @pypotage.prepare(
         TestKwargsFlavour()
     )
-    def test_ingredient1() -> str:
-        return "test"
+    def test_ingredient1() -> str: ...
 
-    assert pypotage.cook(str, proxies=[RetrieveRawIngredient]).take_out() \
-        .formula.extra["__test__"] == 1
+    assert pypotage.cook(str) == 1
 
     @pypotage.prepare(
         TestKwargsFlavour(value=25)
     )
-    def test_ingredient2() -> str:
-        return "test"
+    def test_ingredient2() -> str: ...
 
-    assert pypotage.cook(str, proxies=[RetrieveRawIngredient]).take_out() \
-        .formula.extra["__test__"] == 25
+    assert pypotage.cook(str) == 25
 
     @pypotage.prepare(
         TestKwargsFlavour(15)
     )
-    def test_ingredient3() -> str:
-        return "test"
+    def test_ingredient3() -> str: ...
 
-    assert pypotage.cook(str, proxies=[RetrieveRawIngredient]).take_out() \
-        .formula.extra["__test__"] == 15
+    assert pypotage.cook(str) == 15

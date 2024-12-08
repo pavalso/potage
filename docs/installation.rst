@@ -31,6 +31,31 @@ you can install the latest development version from the GitHub repository:
    cd potage
    python -m pip install -U .
 
+Development
+====================
+
+In case you want to contribute to this proyect you'll need to install the required dependencies for it:
+
+.. code-block:: bash
+
+   python -m pip install --editable -U .[dev]
+
+This will install all the dependencies required for:
+
+- Testing
+- Documentation
+
+You can also install the required dependencies for each section:
+
+.. code-block:: bash
+
+   python -m pip install --editable -U .[test]
+
+Or for documentation
+
+.. code-block:: bash
+
+   python -m pip install --editable -U .[doc]
 
 Tests
 ====================

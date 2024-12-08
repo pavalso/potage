@@ -14,38 +14,32 @@ class TestGeneric(typing.Generic[T]):
 
 @pytest.fixture(autouse=True)
 def reset():
-    pypotage.kitchen_.pot.ingredients.clear()
+    pypotage.kitchen_.pot.clear()
 
 
 def test_generic_chef():
     pypotage.prepare(TestGeneric[int])
 
-    pytest.raises(RuntimeError, pypotage.cook(TestGeneric).take_out)
-
-    myGeneric = pypotage.cook(TestGeneric[int]).take_out()
-    assert isinstance(myGeneric, TestGeneric)
+    assert isinstance(pypotage.cook(TestGeneric), TestGeneric)
+    assert isinstance(pypotage.cook(TestGeneric[int]), TestGeneric)
 
 
 def test_generic_subclasses():
     class TestGenericSubclass(TestGeneric[T]):
         ...
     
-    pytest.raises(RuntimeError, pypotage.cook(TestGeneric[int]).take_out)
-    
+    pytest.raises(RuntimeError, pypotage.unpack, pypotage.cook(TestGeneric[int]))
+
     pypotage.prepare(TestGenericSubclass[int])
 
-    assert isinstance(
-        pypotage.cook(TestGeneric[int]).take_out(), TestGenericSubclass)
-    assert isinstance(
-        pypotage.cook(TestGenericSubclass[int]).take_out(), TestGenericSubclass)
+    assert isinstance(pypotage.cook(TestGeneric[int]), TestGenericSubclass)
+    assert isinstance(pypotage.cook(TestGenericSubclass[int]), TestGenericSubclass)
 
-    pytest.raises(RuntimeError, pypotage.cook(TestGeneric).take_out)
-    pytest.raises(RuntimeError, pypotage.cook(TestGeneric[str]).take_out)
+    pytest.raises(RuntimeError, pypotage.unpack, pypotage.cook(TestGeneric[str]))
 
     pypotage.prepare(TestGenericSubclass[str])
     
-    assert isinstance(
-        pypotage.cook(TestGeneric[str]).take_out(), TestGenericSubclass)
+    assert isinstance(pypotage.cook(TestGeneric[str]), TestGenericSubclass)
 
 
 def test_non_generic_subclasses():
@@ -56,14 +50,10 @@ def test_non_generic_subclasses():
         ...
 
     pypotage.prepare(TestSubclassOfNonGenericSubclass)
-    assert isinstance(
-        pypotage.cook(TestGeneric[int]).take_out(),
-        TestSubclassOfNonGenericSubclass)
-    pytest.raises(RuntimeError, pypotage.cook(TestGeneric).take_out)
 
-    assert isinstance(
-        pypotage.cook(TestNonGenericSubclass).take_out(),
-        TestSubclassOfNonGenericSubclass)
+    assert isinstance(pypotage.cook(TestGeneric[int]), TestSubclassOfNonGenericSubclass)
+    assert isinstance(pypotage.cook(TestGeneric), TestSubclassOfNonGenericSubclass)
+    assert isinstance(pypotage.cook(TestNonGenericSubclass), TestSubclassOfNonGenericSubclass)
 
 
 def test_list_of_generics():
@@ -83,15 +73,15 @@ def test_list_of_generics():
     class TestGeneric4(TestGeneric[int]):
         ...
 
-    _list_of_generics = pypotage.cook(list[TestGeneric]).take_out()
+    _list_of_generics = pypotage.cook(list[TestGeneric])
 
     assert isinstance(_list_of_generics, list)
     assert all(
-        isinstance(x, TestGeneric1) or isinstance(x, TestGeneric2)
+        isinstance(x, TestGeneric1) or isinstance(x, TestGeneric2) or isinstance(x, TestGeneric3) or isinstance(x, TestGeneric4)
         for x in _list_of_generics)
-    assert len(_list_of_generics) == 2
+    assert len(_list_of_generics) == 4
 
-    _list_of_intspecifics = pypotage.cook(list[TestGeneric[int]]).take_out()
+    _list_of_intspecifics = pypotage.cook(list[TestGeneric[int]])
 
     assert isinstance(_list_of_intspecifics, list)
     assert all(
@@ -107,20 +97,17 @@ def test_multiple_generic_class():
         ...
 
     pypotage.prepare(MultipleGeneric[int, str])
-    assert isinstance(
-        pypotage.cook(MultipleGeneric[int, str]).take_out(),
-        MultipleGeneric)
+    assert isinstance(pypotage.cook(MultipleGeneric[int, str]), MultipleGeneric)
 
 
 def test_generic_chef_solo():
     kitchen_ = pypotage.Kitchen(
-        pypotage.Pot(),
-        [pypotage.chefs.GenericChef()]
+        chefs=[pypotage.chefs.GenericChef]
     )
 
     @kitchen_.prepare
     class Bean(TestGeneric[int]):
         ...
 
-    assert isinstance(kitchen_.cook(TestGeneric[int]).take_out(), Bean)
-    assert isinstance(kitchen_.cook(Bean).take_out(), Bean)
+    assert isinstance(kitchen_.cook(TestGeneric[int]), Bean)
+    assert isinstance(kitchen_.cook(Bean), Bean)
