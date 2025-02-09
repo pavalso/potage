@@ -1,3 +1,5 @@
+from typing import TypeAlias
+
 from .utils import Priority
 
 from . import abc
@@ -14,7 +16,7 @@ from .implementations import (
     orders
 )
 
-from .implementations.waiters.waiter import Waiter
+from .implementations.waiters import Waiter
 from .implementations.pot import Pot
 from .implementations.kitchen import Kitchen
 from .implementations.chefLine import ChefLine
@@ -25,12 +27,13 @@ from .implementations.chefs import DEFAULT_CHEFS
 from .implementations.flavours import DEFAULT_FLAVOURS
 
 
-lazy = flavours.LazyFlavour
-no_call = flavours.NoCallFlavour
-order = flavours.OrderFlavour
-primary = flavours.PrimaryFlavour
-id = flavours.IdFlavour
-type = flavours.TypeFlavour
+lazy: TypeAlias = flavours.LazyFlavour
+no_call: TypeAlias = flavours.NoCallFlavour
+order: TypeAlias = flavours.OrderFlavour
+primary: TypeAlias = flavours.PrimaryFlavour
+id: TypeAlias = flavours.IdFlavour
+type: TypeAlias = flavours.TypeFlavour
+singleton: TypeAlias = flavours.SingletonFlavour
 
 def __prepare_kitchen() -> abc.Kitchen:
     return Kitchen()

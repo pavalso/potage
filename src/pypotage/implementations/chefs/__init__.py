@@ -15,5 +15,6 @@ __all__ = [
     "GenericChef",
     "ListChef",
     "CacheChef",
+    "AsyncChef",
     "DEFAULT_CHEFS"
 ]

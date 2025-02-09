@@ -1,5 +1,5 @@
 from typing import Generic, TypeVar
-import src.pypotage as pypotage
+import pypotage
 
 import logging
 import traceback

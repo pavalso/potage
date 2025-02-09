@@ -21,8 +21,7 @@ class Formula:
 
     @property
     def order(self) -> int:
-        return -inf if self.primary else self.__order
-
+        return inf if self.primary else self.__order
     @order.setter
     def order(self, value: int) -> None:
         self.__order = value

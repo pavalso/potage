@@ -7,6 +7,7 @@ from .potABC import PotABC as Pot
 from .kitchenABC import KitchenABC as Kitchen
 from .formula import Formula
 from .orderABC import OrderABC as Order
+from .mealABC import MealABC as Meal
 
 
 __all__ = [
@@ -18,5 +19,6 @@ __all__ = [
     "Kitchen",
     "Formula",
     "Waiter",
-    "Order"
+    "Order",
+    "Meal"
 ]

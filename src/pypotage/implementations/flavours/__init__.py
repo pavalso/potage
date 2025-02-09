@@ -8,6 +8,7 @@ from .orderFlavour import OrderFlavour
 from .primaryFlavour import PrimaryFlavour
 from .typeFlavour import TypeFlavour
 from .staticTypeCheckerFlavour import StaticTypeCheckerFlavour
+from .singletonFlavour import SingletonFlavour
 
 
 DEFAULT_FLAVOURS: list[FlavourABC] = [
@@ -23,6 +24,7 @@ __all__ = [
     "OrderFlavour",
     "PrimaryFlavour",
     "TypeFlavour",
+    "SingletonFlavour",
     "StaticTypeCheckerFlavour",
     "DEFAULT_FLAVOURS"
 ]

@@ -27,9 +27,14 @@ class GenericWaiter(WaiterABC):
         for _ingredient_base in _ingredient_bases:
             _ingredient_type, _ingredient_args = _ingredient_base.__origin__, _ingredient_base.__args__
             for _base in _bases:
-                _type, args, parameters = _base.__origin__, _base.__args__, _base.__parameters__
+                if not hasattr(_base, "__origin__"):
+                    continue
+                _type, args = _base.__origin__, _base.__args__ or _base.__parameters__
                 if not issubclass(_ingredient_type, _type):
                     continue
-                if parameters != args and args != _ingredient_args:
+                args = [arg for arg in args if isinstance(arg, type)]
+                _ingredient_args = [arg for arg in _ingredient_args if isinstance(arg, type)]
+                if not all([issubclass(pair[0], pair[1]) for pair in zip(_ingredient_args, args)]):
                     continue
                 _matches.append(ingredient)
+                break

@@ -14,7 +14,8 @@ class Waiter(WaiterABC):
 
         ingredients = sorted(
             ingredients,
-            key=lambda ingredient: ingredient.formula.order
+            key=lambda ingredient: ingredient.formula.order,
+            reverse=True
         )
 
         return ingredients

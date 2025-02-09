@@ -52,7 +52,9 @@ class CacheChef(ChefABC):
             return cache_waiter.value
 
         def __cache__(*args, **kwargs):
-            if cache_waiter.cache_item is not None and cache_waiter.cache_item.checksum == cache_waiter.checksum:
+            if cache_waiter.cache_item is not None \
+                    and cache_waiter.cache_item.checksum == cache_waiter.checksum \
+                    and not cache_waiter.exception:
                 return __return__()
 
             try:
